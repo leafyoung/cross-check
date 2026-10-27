@@ -1,0 +1,324 @@
+{
+  "comment": "Canonical cross-check cases. 'golden' names the QuantLib reference computation in scripts/golden_quantlib.py; null = no QuantLib equivalent (libraries compare pairwise only).",
+  "cases": [
+    {
+      "id": "bsm_eu_call",
+      "model": "bsm",
+      "golden": "bsm",
+      "params": {
+        "option_type": "call",
+        "option_style": "european",
+        "spot": 100,
+        "strike": 100,
+        "expiry": 1.0,
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.02
+      }
+    },
+    {
+      "id": "bsm_eu_put",
+      "model": "bsm",
+      "golden": "bsm",
+      "params": {
+        "option_type": "put",
+        "option_style": "european",
+        "spot": 100,
+        "strike": 100,
+        "expiry": 1.0,
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.02
+      }
+    },
+    {
+      "id": "crr_eu_call",
+      "model": "binomial",
+      "golden": "crr",
+      "params": {
+        "option_type": "call",
+        "option_style": "european",
+        "spot": 100,
+        "strike": 100,
+        "expiry": 1.0,
+        "volatility": 0.2,
+        "rate": 0.05,
+        "steps": 100
+      }
+    },
+    {
+      "id": "crr_amer_put",
+      "model": "binomial",
+      "golden": "crr",
+      "params": {
+        "option_type": "put",
+        "option_style": "american",
+        "spot": 100,
+        "strike": 100,
+        "expiry": 1.0,
+        "volatility": 0.2,
+        "rate": 0.05,
+        "steps": 100
+      }
+    },
+    {
+      "id": "amer_put_100",
+      "model": "american_option",
+      "golden": "crr",
+      "params": {
+        "option_type": "put",
+        "spot": 100,
+        "strike": 100,
+        "expiry": 1.0,
+        "volatility": 0.2,
+        "rate": 0.05,
+        "steps": 100
+      }
+    },
+    {
+      "id": "berm_put",
+      "model": "bermudan_option",
+      "golden": null,
+      "params": {
+        "option_type": "put",
+        "spot": 100,
+        "strike": 100,
+        "expiry": 1.0,
+        "volatility": 0.2,
+        "rate": 0.05,
+        "steps": 100,
+        "exercise_dates": [
+          0,
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90
+        ]
+      }
+    },
+    {
+      "id": "asian_call",
+      "model": "asian_option",
+      "golden": null,
+      "params": {
+        "option_type": "call",
+        "spot": 100,
+        "strike": 100,
+        "expiry": 1.0,
+        "volatility": 0.2,
+        "rate": 0.05,
+        "steps": 32,
+        "num_paths": 64,
+        "seed": 2007
+      }
+    },
+    {
+      "id": "heston_cf_call",
+      "model": "heston_cf",
+      "golden": "heston",
+      "params": {
+        "spot": 100,
+        "strike": 100,
+        "expiry": 1.0,
+        "rate": 0.05,
+        "dividend": 0.0,
+        "option_type": "call",
+        "kappa": 1.0,
+        "theta": 0.04,
+        "sigma_v": 0.5,
+        "rho": -0.5,
+        "v0": 0.04
+      }
+    },
+    {
+      "id": "heston_mc_call",
+      "model": "heston_mc",
+      "golden": null,
+      "params": {
+        "spot": 100,
+        "strike": 100,
+        "expiry": 1.0,
+        "rate": 0.05,
+        "dividend": 0.0,
+        "option_type": "call",
+        "kappa": 1.0,
+        "theta": 0.04,
+        "sigma_v": 0.5,
+        "rho": -0.5,
+        "v0": 0.04,
+        "n_paths": 64,
+        "steps": 32,
+        "seed": 2007
+      }
+    },
+    {
+      "id": "sabr_iv",
+      "model": "sabr_iv",
+      "golden": "sabr_iv",
+      "params": {
+        "alpha": 0.4,
+        "beta": 0.6,
+        "rho": -0.3,
+        "nu": 1.0,
+        "f0": 100,
+        "strike": 110,
+        "expiry": 1.0
+      }
+    },
+    {
+      "id": "sabr_price",
+      "model": "sabr_price",
+      "golden": null,
+      "params": {
+        "alpha": 0.4,
+        "beta": 0.6,
+        "rho": -0.3,
+        "nu": 1.0,
+        "f0": 100,
+        "strike": 110,
+        "expiry": 1.0,
+        "rate": 0.05,
+        "option_type": "call",
+        "model": "lognormal"
+      }
+    },
+    {
+      "id": "black76_call",
+      "model": "black76",
+      "golden": "black76",
+      "params": {
+        "option_type": "call",
+        "forward": 100,
+        "strike": 100,
+        "expiry": 1.0,
+        "volatility": 0.2,
+        "rate": 0.05
+      }
+    },
+    {
+      "id": "vasicek_zcb_1y",
+      "model": "vasicek_zcb",
+      "golden": "vasicek",
+      "params": {
+        "kappa": 0.15,
+        "theta": 0.05,
+        "sigma": 0.02,
+        "r0": 0.03,
+        "maturity": 1.0
+      }
+    },
+    {
+      "id": "vasicek_zcb_5y",
+      "model": "vasicek_zcb",
+      "golden": "vasicek",
+      "params": {
+        "kappa": 0.15,
+        "theta": 0.05,
+        "sigma": 0.02,
+        "r0": 0.03,
+        "maturity": 5.0
+      }
+    },
+    {
+      "id": "cir_zcb_1y",
+      "model": "cir_zcb",
+      "golden": "cir",
+      "params": {
+        "kappa": 0.15,
+        "theta": 0.05,
+        "sigma": 0.02,
+        "r0": 0.03,
+        "maturity": 1.0
+      }
+    },
+    {
+      "id": "hw_zcb_1y",
+      "model": "hull_white_zcb",
+      "golden": "hull_white",
+      "params": {
+        "a": 0.1,
+        "sigma": 0.01,
+        "r0": 0.03,
+        "maturity": 1.0
+      }
+    },
+    {
+      "id": "bk_zcb_5y",
+      "model": "black_karasinski_zcb",
+      "golden": null,
+      "params": {
+        "a": 0.1,
+        "sigma": 0.01,
+        "r0": 0.03,
+        "maturity": 5.0
+      }
+    },
+    {
+      "id": "digital_call",
+      "model": "digital_option",
+      "golden": null,
+      "params": {
+        "option_type": "call",
+        "spot": 100,
+        "strike": 100,
+        "expiry": 1.0,
+        "volatility": 0.2,
+        "rate": 0.05,
+        "payout": 10,
+        "n_paths": 256,
+        "seed": 2007
+      }
+    },
+    {
+      "id": "barrier_uo",
+      "model": "barrier_option",
+      "golden": null,
+      "params": {
+        "option_type": "call",
+        "barrier_type": "up-and-out",
+        "spot": 100,
+        "strike": 100,
+        "barrier": 120,
+        "expiry": 1.0,
+        "volatility": 0.2,
+        "rate": 0.05,
+        "n_paths": 128,
+        "steps": 32,
+        "seed": 2007
+      }
+    },
+    {
+      "id": "lookback_call",
+      "model": "lookback_option",
+      "golden": null,
+      "params": {
+        "option_type": "call",
+        "spot": 100,
+        "strike": 100,
+        "expiry": 1.0,
+        "volatility": 0.2,
+        "rate": 0.05,
+        "n_paths": 128,
+        "seed": 2007
+      }
+    },
+    {
+      "id": "chooser",
+      "model": "chooser_option",
+      "golden": null,
+      "params": {
+        "spot": 100,
+        "strike": 100,
+        "expiry": 1.0,
+        "volatility": 0.2,
+        "rate": 0.05,
+        "choose_time": 0.5
+      }
+    }
+  ]
+}

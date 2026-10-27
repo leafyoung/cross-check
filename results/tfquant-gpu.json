@@ -1,0 +1,142 @@
+{
+  "backend": "gpu",
+  "results": [
+    {
+      "id": "bsm_eu_call",
+      "ok": true,
+      "price": 9.227005508154061
+    },
+    {
+      "id": "bsm_eu_put",
+      "ok": true,
+      "price": 6.330080627549918
+    },
+    {
+      "id": "crr_eu_call",
+      "ok": true,
+      "price": 10.430611662249671
+    },
+    {
+      "id": "crr_amer_put",
+      "ok": true,
+      "price": 6.082354409141615
+    },
+    {
+      "id": "amer_put_100",
+      "ok": true,
+      "price": 6.082354409141615
+    },
+    {
+      "id": "berm_put",
+      "ok": true,
+      "price": null,
+      "skipped": true,
+      "note": "no tf-quant equivalent in scope"
+    },
+    {
+      "id": "asian_call",
+      "ok": true,
+      "price": null,
+      "skipped": true,
+      "note": "no tf-quant equivalent in scope"
+    },
+    {
+      "id": "heston_cf_call",
+      "ok": true,
+      "price": null,
+      "skipped": true,
+      "note": "no tf-quant equivalent in scope"
+    },
+    {
+      "id": "heston_mc_call",
+      "ok": true,
+      "price": null,
+      "skipped": true,
+      "note": "no tf-quant equivalent in scope"
+    },
+    {
+      "id": "sabr_iv",
+      "ok": true,
+      "price": null,
+      "skipped": true,
+      "note": "no tf-quant equivalent in scope"
+    },
+    {
+      "id": "sabr_price",
+      "ok": true,
+      "price": null,
+      "skipped": true,
+      "note": "no tf-quant equivalent in scope"
+    },
+    {
+      "id": "black76_call",
+      "ok": true,
+      "price": null,
+      "skipped": true,
+      "note": "no tf-quant equivalent in scope"
+    },
+    {
+      "id": "vasicek_zcb_1y",
+      "ok": true,
+      "price": null,
+      "skipped": true,
+      "note": "no tf-quant equivalent in scope"
+    },
+    {
+      "id": "vasicek_zcb_5y",
+      "ok": true,
+      "price": null,
+      "skipped": true,
+      "note": "no tf-quant equivalent in scope"
+    },
+    {
+      "id": "cir_zcb_1y",
+      "ok": true,
+      "price": null,
+      "skipped": true,
+      "note": "no tf-quant equivalent in scope"
+    },
+    {
+      "id": "hw_zcb_1y",
+      "ok": true,
+      "price": null,
+      "skipped": true,
+      "note": "no tf-quant equivalent in scope"
+    },
+    {
+      "id": "bk_zcb_5y",
+      "ok": true,
+      "price": null,
+      "skipped": true,
+      "note": "no tf-quant equivalent in scope"
+    },
+    {
+      "id": "digital_call",
+      "ok": true,
+      "price": null,
+      "skipped": true,
+      "note": "no tf-quant equivalent in scope"
+    },
+    {
+      "id": "barrier_uo",
+      "ok": true,
+      "price": null,
+      "skipped": true,
+      "note": "no tf-quant equivalent in scope"
+    },
+    {
+      "id": "lookback_call",
+      "ok": true,
+      "price": null,
+      "skipped": true,
+      "note": "no tf-quant equivalent in scope"
+    },
+    {
+      "id": "chooser",
+      "ok": true,
+      "price": null,
+      "skipped": true,
+      "note": "no tf-quant equivalent in scope"
+    }
+  ]
+}

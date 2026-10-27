@@ -1,0 +1,115 @@
+{
+  "backend": "cpu",
+  "results": [
+    {
+      "id": "bsm_eu_call",
+      "ok": true,
+      "price": 9.227005508154036
+    },
+    {
+      "id": "bsm_eu_put",
+      "ok": true,
+      "price": 6.330080627549918
+    },
+    {
+      "id": "crr_eu_call",
+      "ok": true,
+      "price": 10.430611662249113
+    },
+    {
+      "id": "crr_amer_put",
+      "ok": true,
+      "price": 6.082354409142444
+    },
+    {
+      "id": "amer_put_100",
+      "ok": true,
+      "price": 6.082354409142444
+    },
+    {
+      "id": "berm_put",
+      "ok": true,
+      "price": 6.025795352002811
+    },
+    {
+      "id": "asian_call",
+      "ok": true,
+      "price": 7.020513534545898,
+      "rng_divergent": true
+    },
+    {
+      "id": "heston_cf_call",
+      "ok": true,
+      "price": 9.897022247314453
+    },
+    {
+      "id": "heston_mc_call",
+      "ok": true,
+      "price": 9.927351951599121,
+      "rng_divergent": true
+    },
+    {
+      "id": "sabr_iv",
+      "ok": true,
+      "price": 0.07368795573711395
+    },
+    {
+      "id": "sabr_price",
+      "ok": true,
+      "price": 0.936774730682373
+    },
+    {
+      "id": "black76_call",
+      "ok": true,
+      "price": 7.57708214642728
+    },
+    {
+      "id": "vasicek_zcb_1y",
+      "ok": true,
+      "price": 0.9691188335418701
+    },
+    {
+      "id": "vasicek_zcb_5y",
+      "ok": true,
+      "price": 0.8396917581558228
+    },
+    {
+      "id": "cir_zcb_1y",
+      "ok": true,
+      "price": 0.9690644145011902
+    },
+    {
+      "id": "hw_zcb_1y",
+      "ok": true,
+      "price": 0.9704455137252808
+    },
+    {
+      "id": "bk_zcb_5y",
+      "ok": true,
+      "price": 0.7105591893196106
+    },
+    {
+      "id": "digital_call",
+      "ok": true,
+      "price": 5.164878845214844,
+      "rng_divergent": true
+    },
+    {
+      "id": "barrier_uo",
+      "ok": true,
+      "price": 1.089030385017395,
+      "rng_divergent": true
+    },
+    {
+      "id": "lookback_call",
+      "ok": true,
+      "price": 20.550872802734375,
+      "rng_divergent": true
+    },
+    {
+      "id": "chooser",
+      "ok": true,
+      "price": 6.71864526308475
+    }
+  ]
+}
