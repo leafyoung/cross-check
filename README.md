@@ -116,3 +116,45 @@ discount-order bug was 5e-4.
 bermudan exercise-date variant, Asian MC, BK ZCB, digital/barrier/lookback MC,
 heston_mc. tf-quant scope: BSM vanilla + CRR binomial only (5 of 21 cases
 priced, 16 SKIP).
+
+
+## tf-quant ↔ QuantLib deep check (2026-10-28)
+
+Expanded the catalog from 21 to 34 cases (13 new `tfq_` cases) covering the full
+tf-quant ↔ QuantLib overlap:
+
+| family | cases | tf-quant API | QuantLib golden | result |
+|---|---|---|---|---|
+| implied vol (Newton) | 2 | `implied_vol` | roundtrip vs true vol (market price from BlackCalculator) | 3.3e-9 / 2.3e-8 |
+| implied vol (Stefanica-Radiocic approx) | 1 | `implied_vol_approx` | same, tol 1e-3 (approximation) | 5.8e-4 PASS |
+| analytic Asian (discrete geometric, monthly) | 1 | `asian_option_price` | `AnalyticDiscreteGeometricAveragePriceAsianEngine` | 7.2e-12 (after aligning sampling times to whole days: QL fixing dates are ref+round(365t)) |
+| analytic barrier ×4 | 4 | `vanilla_prices.barrier_price` | `AnalyticBarrierEngine` (rebate 0, continuous) | ≤1e-14 all |
+| binary (cash-or-nothing) ×2 | 2 | `vanilla_prices.binary_price` | `CashOrNothingPayoff` + `AnalyticEuropeanEngine` | exact after FIX (below) |
+| PDE vanilla European | 1 | `math.pde.fd_solvers.solve_backward` (docstring BS recipe + dividend drift) | `FdBlackScholesVanillaEngine` | 2.0e-4, tol 5e-3 (discretization both sides) |
+| swap-curve bootstrap | 1 | `rates.swap_curve_bootstrap` (par swaps off a flat 3% continuous curve, linear-zero basis) | `PiecewiseLinearZero` + SwapRateHelpers | 3.1e-7 on DFs |
+| Brownian bridge | 0 | SKIP — tff's is a barrier-hit-probability series; QL's BrownianBridge builds path variances. No shared quantity. | | |
+| arithmetic Asian | 0 | SKIP — `asian_option_price` raises NotImplementedError for ARITHMETIC (asian_prices.py:201) | | |
+
+### FIXED: `binary_price` ignored `dividend_rates`
+When priced from `spots`, tff used forward `S·e^{rT}` (the accepted
+`dividend_rates` argument was converted and never used) → binary calls
+over-priced (ATM 1y: 0.5323 vs 0.4946 at q=2%), puts under-priced. Fixed to
+`S·e^{(r−q)T}/DF·…`; verified against an independent closed-form reference
+(N(d2)·e^{−rT}) reproducing both the old and new values exactly, and against
+QuantLib. Existing tff binary tests use explicit `forwards` and never
+exercised the spots path — unchanged, black_scholes module 143 passed.
+Same `spots/DF` pattern in `implied_vol_approximation.py` /
+`implied_vol_newton_root.py` is NOT a bug: those APIs take no dividend
+argument (documented contract).
+
+### Harness lessons (this round)
+- QuantLib puts barrier/averaging params on the INSTRUMENT (BarrierOption,
+  DiscreteAveragingAsianOption), not the engine.
+- QL MC engines take no timeSteps for date-scheduled options (fixing dates drive the grid).
+- swap_curve_bootstrap convention: fixed-leg cashflows are NEGATIVE (paid) —
+  par swaps must pass −par; daycount fractions must be explicit (0.5 float,
+  1.0 fixed) or the PV equation silently mis-accrues.
+- `tff.asian_option_price` sampling_times shape is `[n] + batch_shape`.
+
+**Final: 292 PASS / 0 FAIL / 67 SKIP** (SKIP = no QuantLib equivalent or no
+tf-quant capability, each with a stated reason).

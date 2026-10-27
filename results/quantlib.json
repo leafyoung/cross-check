@@ -147,6 +147,105 @@
       "price": null,
       "skipped": true,
       "note": "no QuantLib equivalent"
+    },
+    {
+      "id": "tfq_iv_newton_call",
+      "ok": true,
+      "price": 0.2,
+      "golden": "tfq_iv",
+      "tol": 1e-06
+    },
+    {
+      "id": "tfq_iv_newton_put",
+      "ok": true,
+      "price": 0.35,
+      "golden": "tfq_iv",
+      "tol": 1e-06
+    },
+    {
+      "id": "tfq_iv_approx_atm",
+      "ok": true,
+      "price": 0.2,
+      "golden": "tfq_iv_approx",
+      "tol": 0.001
+    },
+    {
+      "id": "tfq_asian_geo_m",
+      "ok": true,
+      "price": 5.289698532378271,
+      "golden": "tfq_asian_geo",
+      "tol": 1e-06
+    },
+    {
+      "id": "tfq_asian_arith_lb",
+      "ok": true,
+      "price": null,
+      "skipped": true,
+      "note": "no QuantLib equivalent"
+    },
+    {
+      "id": "tfq_barrier_doko_call",
+      "ok": true,
+      "price": 8.759460458735855,
+      "golden": "tfq_barrier",
+      "tol": 1e-06
+    },
+    {
+      "id": "tfq_barrier_uoko_put",
+      "ok": true,
+      "price": 7.902600854338457,
+      "golden": "tfq_barrier",
+      "tol": 1e-06
+    },
+    {
+      "id": "tfq_barrier_diki_call",
+      "ok": true,
+      "price": 0.5479573225762566,
+      "golden": "tfq_barrier",
+      "tol": 1e-06
+    },
+    {
+      "id": "tfq_barrier_uiki_put",
+      "ok": true,
+      "price": 0.01342299254364765,
+      "golden": "tfq_barrier",
+      "tol": 1e-06
+    },
+    {
+      "id": "tfq_binary_call",
+      "ok": true,
+      "price": 0.4945810910532236,
+      "golden": "tfq_binary",
+      "tol": 1e-06
+    },
+    {
+      "id": "tfq_binary_put",
+      "ok": true,
+      "price": 0.557506659561213,
+      "golden": "tfq_binary",
+      "tol": 1e-06
+    },
+    {
+      "id": "tfq_pde_eu_call",
+      "ok": true,
+      "price": 9.227498466146917,
+      "golden": "tfq_pde",
+      "tol": 0.005
+    },
+    {
+      "id": "tfq_swapcurve_flat",
+      "ok": true,
+      "price": {
+        "dfs": [
+          0.9924722287796063,
+          0.9850011248987591,
+          0.9702275176520118,
+          0.9556751976523937,
+          0.9413411446588232
+        ]
+      },
+      "golden": "tfq_swapcurve",
+      "tol": 1e-06
     }
   ]
 }

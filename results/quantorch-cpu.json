@@ -110,6 +110,71 @@
       "id": "chooser",
       "ok": true,
       "price": 6.71864526308475
+    },
+    {
+      "id": "tfq_iv_newton_call",
+      "ok": false,
+      "error": "ValueError: unknown model 'iv'"
+    },
+    {
+      "id": "tfq_iv_newton_put",
+      "ok": false,
+      "error": "ValueError: unknown model 'iv'"
+    },
+    {
+      "id": "tfq_iv_approx_atm",
+      "ok": false,
+      "error": "ValueError: unknown model 'iv'"
+    },
+    {
+      "id": "tfq_asian_geo_m",
+      "ok": false,
+      "error": "ValueError: unknown model 'asian_analytic'"
+    },
+    {
+      "id": "tfq_asian_arith_lb",
+      "ok": false,
+      "error": "ValueError: unknown model 'asian_analytic'"
+    },
+    {
+      "id": "tfq_barrier_doko_call",
+      "ok": false,
+      "error": "ValueError: unknown model 'barrier'"
+    },
+    {
+      "id": "tfq_barrier_uoko_put",
+      "ok": false,
+      "error": "ValueError: unknown model 'barrier'"
+    },
+    {
+      "id": "tfq_barrier_diki_call",
+      "ok": false,
+      "error": "ValueError: unknown model 'barrier'"
+    },
+    {
+      "id": "tfq_barrier_uiki_put",
+      "ok": false,
+      "error": "ValueError: unknown model 'barrier'"
+    },
+    {
+      "id": "tfq_binary_call",
+      "ok": false,
+      "error": "ValueError: unknown model 'binary'"
+    },
+    {
+      "id": "tfq_binary_put",
+      "ok": false,
+      "error": "ValueError: unknown model 'binary'"
+    },
+    {
+      "id": "tfq_pde_eu_call",
+      "ok": false,
+      "error": "ValueError: unknown model 'pde_eu'"
+    },
+    {
+      "id": "tfq_swapcurve_flat",
+      "ok": false,
+      "error": "ValueError: unknown model 'swap_curve'"
     }
   ]
 }

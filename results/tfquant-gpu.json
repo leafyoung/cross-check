@@ -137,6 +137,79 @@
       "price": null,
       "skipped": true,
       "note": "no tf-quant equivalent in scope"
+    },
+    {
+      "id": "tfq_iv_newton_call",
+      "ok": true,
+      "price": 0.19999999934190832
+    },
+    {
+      "id": "tfq_iv_newton_put",
+      "ok": true,
+      "price": 0.34999999192657055
+    },
+    {
+      "id": "tfq_iv_approx_atm",
+      "ok": true,
+      "price": 0.1998836711254216
+    },
+    {
+      "id": "tfq_asian_geo_m",
+      "ok": true,
+      "price": 5.289698532340211
+    },
+    {
+      "id": "tfq_asian_arith_lb",
+      "ok": true,
+      "price": 5.327705787469661
+    },
+    {
+      "id": "tfq_barrier_doko_call",
+      "ok": true,
+      "price": 8.759460458735848
+    },
+    {
+      "id": "tfq_barrier_uoko_put",
+      "ok": true,
+      "price": 7.902600854338466
+    },
+    {
+      "id": "tfq_barrier_diki_call",
+      "ok": true,
+      "price": 0.5479573225762513
+    },
+    {
+      "id": "tfq_barrier_uiki_put",
+      "ok": true,
+      "price": 0.013422992543647733
+    },
+    {
+      "id": "tfq_binary_call",
+      "ok": true,
+      "price": 0.49458109105322323
+    },
+    {
+      "id": "tfq_binary_put",
+      "ok": true,
+      "price": 0.557506659561213
+    },
+    {
+      "id": "tfq_pde_eu_call",
+      "ok": true,
+      "price": 9.225655480022269
+    },
+    {
+      "id": "tfq_swapcurve_flat",
+      "ok": true,
+      "values": {
+        "dfs": [
+          0.9924722287796063,
+          0.9850011248987592,
+          0.9702272160518214,
+          0.9556748992184355,
+          0.9413408507676673
+        ]
+      }
     }
   ]
 }

@@ -18,10 +18,20 @@ for f in sorted(res_dir.glob("*.json")):
         continue
     libs[f.stem] = {r["id"]: r for r in json.loads(f.read_text())["results"]}
 
+def is_unknown_model(r):
+    return (not r["ok"]) and str(r.get("error", "")).find("unknown model") >= 0
+
 def get_price(r):
     if not r["ok"]:
         return None
     return r.get("price")
+
+def get_metric(cid, r, g):
+    """Comparison metric: scalar price, or dfs vector (swap curve)."""
+    if isinstance(g, dict) and "dfs" in g:
+        rv = r.get("values") or {}
+        return ("dfs", rv.get("dfs"))
+    return ("price", r.get("price"))
 
 STOCHASTIC = {c["id"] for c in cases if "seed" in c.get("params", {})}
 
@@ -40,19 +50,33 @@ for name, res in libs.items():
             continue
         if cid in STOCHASTIC:
             continue  # stochastic cases have no golden; compared lib-vs-lib only
-        lp = get_price(r)
-        if lp is None:
-            verdict = "SKIP" if r.get("skipped") else "FAIL"
-            note = r.get("note") or r.get("error")
-            lines.append(f"| {cid} | {name} | ({note}) | {g['price']:.10g} | — | — | {verdict} |")
+        metric_name, lp = get_metric(cid, r, g.get("price"))
+        if metric_name == "dfs" and g.get("price") is None:
             continue
-        e = rel(lp, g["price"])
+        if lp is None:
+            verdict = "SKIP" if (r.get("skipped") or is_unknown_model(r)) else "FAIL"
+            note = r.get("note") or r.get("error")
+            gshow = g["price"]
+            gshow = gshow.get("dfs", ["?"])[0] if isinstance(gshow, dict) else gshow
+            lines.append(f"| {cid} | {name} | ({note}) | {gshow:.10g} | — | — | {verdict} |")
+            continue
+        if metric_name == "dfs":
+            gdfs = g["price"]["dfs"]
+            if len(lp) != len(gdfs):
+                lines.append(f"| {cid} | {name} | len mismatch | — | — | — | FAIL |")
+                continue
+            e = max(abs(a - b) / max(abs(b), 1e-300) for a, b in zip(lp, gdfs))
+            lp = gdfs[0]  # representative display value
+        else:
+            e = rel(lp, g["price"])
         tol = g.get("tol", 1e-6)
         # quantorch stores model params at f32 precision -> widen accordingly
         if name.startswith("quantorch"):
             tol = max(tol, 1e-5)
         verdict = "PASS" if e <= tol else "FAIL"
-        lines.append(f"| {cid} | {name} | {lp:.10g} | {g['price']:.10g} | {e:.2e} | {tol:.0e} | {verdict} |")
+        gshow = g["price"]
+        gshow = gshow.get("dfs", ["?"])[0] if isinstance(gshow, dict) else gshow
+        lines.append(f"| {cid} | {name} | {lp:.10g} | {gshow:.10g} | {e:.2e} | {tol:.0e} | {verdict} |")
 
 lines += ["", "## library vs library (same case ids)"]
 lines.append("| case | a | b | a price | b price | rel err | verdict |")
@@ -66,6 +90,8 @@ for i in range(len(names)):
         for cid in libs[a]:
             if cid not in libs[b]:
                 continue
+            if is_unknown_model(libs[a][cid]) or is_unknown_model(libs[b][cid]):
+                continue  # model not implemented in that library
             pa, pb = get_price(libs[a][cid]), get_price(libs[b][cid])
             if pa is None or pb is None:
                 continue

@@ -15,6 +15,18 @@
 | vasicek_zcb_5y | quantburn-cpu | 0.8396917673 | 0.8396917673 | 0.00e+00 | 1e-06 | PASS |
 | cir_zcb_1y | quantburn-cpu | 0.9690627652 | 0.9690627652 | 0.00e+00 | 1e-06 | PASS |
 | hw_zcb_1y | quantburn-cpu | 0.9704455335 | 0.9704455335 | 8.38e-13 | 1e-06 | PASS |
+| tfq_iv_newton_call | quantburn-cpu | (unknown model 'iv') | 0.2 | — | — | SKIP |
+| tfq_iv_newton_put | quantburn-cpu | (unknown model 'iv') | 0.35 | — | — | SKIP |
+| tfq_iv_approx_atm | quantburn-cpu | (unknown model 'iv') | 0.2 | — | — | SKIP |
+| tfq_asian_geo_m | quantburn-cpu | (unknown model 'asian_analytic') | 5.289698532 | — | — | SKIP |
+| tfq_barrier_doko_call | quantburn-cpu | (unknown model 'barrier') | 8.759460459 | — | — | SKIP |
+| tfq_barrier_uoko_put | quantburn-cpu | (unknown model 'barrier') | 7.902600854 | — | — | SKIP |
+| tfq_barrier_diki_call | quantburn-cpu | (unknown model 'barrier') | 0.5479573226 | — | — | SKIP |
+| tfq_barrier_uiki_put | quantburn-cpu | (unknown model 'barrier') | 0.01342299254 | — | — | SKIP |
+| tfq_binary_call | quantburn-cpu | (unknown model 'binary') | 0.4945810911 | — | — | SKIP |
+| tfq_binary_put | quantburn-cpu | (unknown model 'binary') | 0.5575066596 | — | — | SKIP |
+| tfq_pde_eu_call | quantburn-cpu | (unknown model 'pde_eu') | 9.227498466 | — | — | SKIP |
+| tfq_swapcurve_flat | quantburn-cpu | (unknown model 'swap_curve') | 0.9924722288 | — | — | SKIP |
 | bsm_eu_call | quantburn-vulkan | 9.227005508 | 9.227005508 | 2.70e-15 | 1e-06 | PASS |
 | bsm_eu_put | quantburn-vulkan | 6.330080628 | 6.330080628 | 1.40e-16 | 1e-06 | PASS |
 | crr_eu_call | quantburn-vulkan | 10.43061166 | 10.42998595 | 6.00e-05 | 1e-04 | PASS |
@@ -27,6 +39,18 @@
 | vasicek_zcb_5y | quantburn-vulkan | 0.8396917673 | 0.8396917673 | 0.00e+00 | 1e-06 | PASS |
 | cir_zcb_1y | quantburn-vulkan | 0.9690627652 | 0.9690627652 | 0.00e+00 | 1e-06 | PASS |
 | hw_zcb_1y | quantburn-vulkan | 0.9704455335 | 0.9704455335 | 8.38e-13 | 1e-06 | PASS |
+| tfq_iv_newton_call | quantburn-vulkan | (unknown model 'iv') | 0.2 | — | — | SKIP |
+| tfq_iv_newton_put | quantburn-vulkan | (unknown model 'iv') | 0.35 | — | — | SKIP |
+| tfq_iv_approx_atm | quantburn-vulkan | (unknown model 'iv') | 0.2 | — | — | SKIP |
+| tfq_asian_geo_m | quantburn-vulkan | (unknown model 'asian_analytic') | 5.289698532 | — | — | SKIP |
+| tfq_barrier_doko_call | quantburn-vulkan | (unknown model 'barrier') | 8.759460459 | — | — | SKIP |
+| tfq_barrier_uoko_put | quantburn-vulkan | (unknown model 'barrier') | 7.902600854 | — | — | SKIP |
+| tfq_barrier_diki_call | quantburn-vulkan | (unknown model 'barrier') | 0.5479573226 | — | — | SKIP |
+| tfq_barrier_uiki_put | quantburn-vulkan | (unknown model 'barrier') | 0.01342299254 | — | — | SKIP |
+| tfq_binary_call | quantburn-vulkan | (unknown model 'binary') | 0.4945810911 | — | — | SKIP |
+| tfq_binary_put | quantburn-vulkan | (unknown model 'binary') | 0.5575066596 | — | — | SKIP |
+| tfq_pde_eu_call | quantburn-vulkan | (unknown model 'pde_eu') | 9.227498466 | — | — | SKIP |
+| tfq_swapcurve_flat | quantburn-vulkan | (unknown model 'swap_curve') | 0.9924722288 | — | — | SKIP |
 | bsm_eu_call | quantcandle-cpu | 9.227005508 | 9.227005508 | 2.70e-15 | 1e-06 | PASS |
 | bsm_eu_put | quantcandle-cpu | 6.330080628 | 6.330080628 | 1.40e-16 | 1e-06 | PASS |
 | crr_eu_call | quantcandle-cpu | 10.43061166 | 10.42998595 | 6.00e-05 | 1e-04 | PASS |
@@ -39,6 +63,18 @@
 | vasicek_zcb_5y | quantcandle-cpu | 0.8396917673 | 0.8396917673 | 0.00e+00 | 1e-06 | PASS |
 | cir_zcb_1y | quantcandle-cpu | 0.9690627652 | 0.9690627652 | 0.00e+00 | 1e-06 | PASS |
 | hw_zcb_1y | quantcandle-cpu | 0.9704455335 | 0.9704455335 | 8.38e-13 | 1e-06 | PASS |
+| tfq_iv_newton_call | quantcandle-cpu | (unknown model 'iv') | 0.2 | — | — | SKIP |
+| tfq_iv_newton_put | quantcandle-cpu | (unknown model 'iv') | 0.35 | — | — | SKIP |
+| tfq_iv_approx_atm | quantcandle-cpu | (unknown model 'iv') | 0.2 | — | — | SKIP |
+| tfq_asian_geo_m | quantcandle-cpu | (unknown model 'asian_analytic') | 5.289698532 | — | — | SKIP |
+| tfq_barrier_doko_call | quantcandle-cpu | (unknown model 'barrier') | 8.759460459 | — | — | SKIP |
+| tfq_barrier_uoko_put | quantcandle-cpu | (unknown model 'barrier') | 7.902600854 | — | — | SKIP |
+| tfq_barrier_diki_call | quantcandle-cpu | (unknown model 'barrier') | 0.5479573226 | — | — | SKIP |
+| tfq_barrier_uiki_put | quantcandle-cpu | (unknown model 'barrier') | 0.01342299254 | — | — | SKIP |
+| tfq_binary_call | quantcandle-cpu | (unknown model 'binary') | 0.4945810911 | — | — | SKIP |
+| tfq_binary_put | quantcandle-cpu | (unknown model 'binary') | 0.5575066596 | — | — | SKIP |
+| tfq_pde_eu_call | quantcandle-cpu | (unknown model 'pde_eu') | 9.227498466 | — | — | SKIP |
+| tfq_swapcurve_flat | quantcandle-cpu | (unknown model 'swap_curve') | 0.9924722288 | — | — | SKIP |
 | bsm_eu_call | quantcandle-mkl | 9.227005508 | 9.227005508 | 2.70e-15 | 1e-06 | PASS |
 | bsm_eu_put | quantcandle-mkl | 6.330080628 | 6.330080628 | 1.40e-16 | 1e-06 | PASS |
 | crr_eu_call | quantcandle-mkl | 10.43061166 | 10.42998595 | 6.00e-05 | 1e-04 | PASS |
@@ -51,6 +87,18 @@
 | vasicek_zcb_5y | quantcandle-mkl | 0.8396917673 | 0.8396917673 | 0.00e+00 | 1e-06 | PASS |
 | cir_zcb_1y | quantcandle-mkl | 0.9690627652 | 0.9690627652 | 0.00e+00 | 1e-06 | PASS |
 | hw_zcb_1y | quantcandle-mkl | 0.9704455335 | 0.9704455335 | 8.38e-13 | 1e-06 | PASS |
+| tfq_iv_newton_call | quantcandle-mkl | (unknown model 'iv') | 0.2 | — | — | SKIP |
+| tfq_iv_newton_put | quantcandle-mkl | (unknown model 'iv') | 0.35 | — | — | SKIP |
+| tfq_iv_approx_atm | quantcandle-mkl | (unknown model 'iv') | 0.2 | — | — | SKIP |
+| tfq_asian_geo_m | quantcandle-mkl | (unknown model 'asian_analytic') | 5.289698532 | — | — | SKIP |
+| tfq_barrier_doko_call | quantcandle-mkl | (unknown model 'barrier') | 8.759460459 | — | — | SKIP |
+| tfq_barrier_uoko_put | quantcandle-mkl | (unknown model 'barrier') | 7.902600854 | — | — | SKIP |
+| tfq_barrier_diki_call | quantcandle-mkl | (unknown model 'barrier') | 0.5479573226 | — | — | SKIP |
+| tfq_barrier_uiki_put | quantcandle-mkl | (unknown model 'barrier') | 0.01342299254 | — | — | SKIP |
+| tfq_binary_call | quantcandle-mkl | (unknown model 'binary') | 0.4945810911 | — | — | SKIP |
+| tfq_binary_put | quantcandle-mkl | (unknown model 'binary') | 0.5575066596 | — | — | SKIP |
+| tfq_pde_eu_call | quantcandle-mkl | (unknown model 'pde_eu') | 9.227498466 | — | — | SKIP |
+| tfq_swapcurve_flat | quantcandle-mkl | (unknown model 'swap_curve') | 0.9924722288 | — | — | SKIP |
 | bsm_eu_call | quantorch-cpu | 9.227005508 | 9.227005508 | 2.70e-15 | 1e-05 | PASS |
 | bsm_eu_put | quantorch-cpu | 6.330080628 | 6.330080628 | 1.40e-16 | 1e-05 | PASS |
 | crr_eu_call | quantorch-cpu | 10.43061166 | 10.42998595 | 6.00e-05 | 1e-04 | PASS |
@@ -63,6 +111,18 @@
 | vasicek_zcb_5y | quantorch-cpu | 0.8396917582 | 0.8396917673 | 1.09e-08 | 1e-05 | PASS |
 | cir_zcb_1y | quantorch-cpu | 0.9690644145 | 0.9690627652 | 1.70e-06 | 1e-05 | PASS |
 | hw_zcb_1y | quantorch-cpu | 0.9704455137 | 0.9704455335 | 2.04e-08 | 1e-05 | PASS |
+| tfq_iv_newton_call | quantorch-cpu | (ValueError: unknown model 'iv') | 0.2 | — | — | SKIP |
+| tfq_iv_newton_put | quantorch-cpu | (ValueError: unknown model 'iv') | 0.35 | — | — | SKIP |
+| tfq_iv_approx_atm | quantorch-cpu | (ValueError: unknown model 'iv') | 0.2 | — | — | SKIP |
+| tfq_asian_geo_m | quantorch-cpu | (ValueError: unknown model 'asian_analytic') | 5.289698532 | — | — | SKIP |
+| tfq_barrier_doko_call | quantorch-cpu | (ValueError: unknown model 'barrier') | 8.759460459 | — | — | SKIP |
+| tfq_barrier_uoko_put | quantorch-cpu | (ValueError: unknown model 'barrier') | 7.902600854 | — | — | SKIP |
+| tfq_barrier_diki_call | quantorch-cpu | (ValueError: unknown model 'barrier') | 0.5479573226 | — | — | SKIP |
+| tfq_barrier_uiki_put | quantorch-cpu | (ValueError: unknown model 'barrier') | 0.01342299254 | — | — | SKIP |
+| tfq_binary_call | quantorch-cpu | (ValueError: unknown model 'binary') | 0.4945810911 | — | — | SKIP |
+| tfq_binary_put | quantorch-cpu | (ValueError: unknown model 'binary') | 0.5575066596 | — | — | SKIP |
+| tfq_pde_eu_call | quantorch-cpu | (ValueError: unknown model 'pde_eu') | 9.227498466 | — | — | SKIP |
+| tfq_swapcurve_flat | quantorch-cpu | (ValueError: unknown model 'swap_curve') | 0.9924722288 | — | — | SKIP |
 | bsm_eu_call | tfquant-gpu | 9.227005508 | 9.227005508 | 0.00e+00 | 1e-06 | PASS |
 | bsm_eu_put | tfquant-gpu | 6.330080628 | 6.330080628 | 1.40e-16 | 1e-06 | PASS |
 | crr_eu_call | tfquant-gpu | 10.43061166 | 10.42998595 | 6.00e-05 | 1e-04 | PASS |
@@ -75,6 +135,18 @@
 | vasicek_zcb_5y | tfquant-gpu | (no tf-quant equivalent in scope) | 0.8396917673 | — | — | SKIP |
 | cir_zcb_1y | tfquant-gpu | (no tf-quant equivalent in scope) | 0.9690627652 | — | — | SKIP |
 | hw_zcb_1y | tfquant-gpu | (no tf-quant equivalent in scope) | 0.9704455335 | — | — | SKIP |
+| tfq_iv_newton_call | tfquant-gpu | 0.1999999993 | 0.2 | 3.29e-09 | 1e-06 | PASS |
+| tfq_iv_newton_put | tfquant-gpu | 0.3499999919 | 0.35 | 2.31e-08 | 1e-06 | PASS |
+| tfq_iv_approx_atm | tfquant-gpu | 0.1998836711 | 0.2 | 5.82e-04 | 1e-03 | PASS |
+| tfq_asian_geo_m | tfquant-gpu | 5.289698532 | 5.289698532 | 7.20e-12 | 1e-06 | PASS |
+| tfq_barrier_doko_call | tfquant-gpu | 8.759460459 | 8.759460459 | 8.11e-16 | 1e-06 | PASS |
+| tfq_barrier_uoko_put | tfquant-gpu | 7.902600854 | 7.902600854 | 1.12e-15 | 1e-06 | PASS |
+| tfq_barrier_diki_call | tfquant-gpu | 0.5479573226 | 0.5479573226 | 9.73e-15 | 1e-06 | PASS |
+| tfq_barrier_uiki_put | tfquant-gpu | 0.01342299254 | 0.01342299254 | 6.20e-15 | 1e-06 | PASS |
+| tfq_binary_call | tfquant-gpu | 0.4945810911 | 0.4945810911 | 7.86e-16 | 1e-06 | PASS |
+| tfq_binary_put | tfquant-gpu | 0.5575066596 | 0.5575066596 | 0.00e+00 | 1e-06 | PASS |
+| tfq_pde_eu_call | tfquant-gpu | 9.22565548 | 9.227498466 | 2.00e-04 | 5e-03 | PASS |
+| tfq_swapcurve_flat | tfquant-gpu | 0.9924722288 | 0.9924722288 | 3.12e-07 | 1e-06 | PASS |
 
 ## library vs library (same case ids)
 | case | a | b | a price | b price | rel err | verdict |

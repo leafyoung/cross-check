@@ -319,6 +319,241 @@
         "rate": 0.05,
         "choose_time": 0.5
       }
+    },
+    {
+      "id": "tfq_iv_newton_call",
+      "model": "iv",
+      "golden": "tfq_iv",
+      "params": {
+        "method": "newton",
+        "spot": 100,
+        "strike": 100,
+        "expiry": 1.0,
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.02,
+        "market_price": 9.227005508154061,
+        "option_type": "call"
+      }
+    },
+    {
+      "id": "tfq_iv_newton_put",
+      "model": "iv",
+      "golden": "tfq_iv",
+      "params": {
+        "method": "newton",
+        "spot": 100,
+        "strike": 90,
+        "expiry": 2.0,
+        "volatility": 0.35,
+        "rate": 0.05,
+        "dividend": 0.02,
+        "market_price": 10.964645199101414,
+        "option_type": "put"
+      }
+    },
+    {
+      "id": "tfq_iv_approx_atm",
+      "model": "iv",
+      "golden": "tfq_iv_approx",
+      "params": {
+        "method": "approx",
+        "spot": 100,
+        "strike": 100,
+        "expiry": 1.0,
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.02,
+        "market_price": 9.227005508154061,
+        "option_type": "call"
+      }
+    },
+    {
+      "id": "tfq_asian_geo_m",
+      "model": "asian_analytic",
+      "golden": "tfq_asian_geo",
+      "params": {
+        "spot": 100,
+        "strike": 100,
+        "expiry": 0.9863013699,
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.02,
+        "option_type": "call",
+        "sampling_times": [
+          0.0821917808,
+          0.1643835616,
+          0.2465753425,
+          0.3287671233,
+          0.4109589041,
+          0.4931506849,
+          0.5753424658,
+          0.6575342466,
+          0.7397260274,
+          0.8219178082,
+          0.904109589,
+          0.9863013699
+        ]
+      }
+    },
+    {
+      "id": "tfq_asian_arith_lb",
+      "model": "asian_analytic",
+      "golden": null,
+      "params": {
+        "spot": 100,
+        "strike": 100,
+        "expiry": 1.0,
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.02,
+        "option_type": "call",
+        "sampling_times": [
+          0.08333333333333333,
+          0.16666666666666666,
+          0.25,
+          0.3333333333333333,
+          0.4166666666666667,
+          0.5,
+          0.5833333333333334,
+          0.6666666666666666,
+          0.75,
+          0.8333333333333334,
+          0.9166666666666666,
+          1.0
+        ]
+      },
+      "skip_reason": "tff asian_option_price raises NotImplementedError for ARITHMETIC averaging (asian_prices.py:201); no tf-quant arithmetic Asian exists to test"
+    },
+    {
+      "id": "tfq_barrier_doko_call",
+      "model": "barrier",
+      "golden": "tfq_barrier",
+      "params": {
+        "spot": 100,
+        "strike": 100,
+        "barrier": 85,
+        "expiry": 1.0,
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.02,
+        "option_type": "call",
+        "barrier_type": "down-and-out"
+      }
+    },
+    {
+      "id": "tfq_barrier_uoko_put",
+      "model": "barrier",
+      "golden": "tfq_barrier",
+      "params": {
+        "spot": 100,
+        "strike": 100,
+        "barrier": 125,
+        "expiry": 1.0,
+        "volatility": 0.25,
+        "rate": 0.05,
+        "dividend": 0.02,
+        "option_type": "put",
+        "barrier_type": "up-and-out"
+      }
+    },
+    {
+      "id": "tfq_barrier_diki_call",
+      "model": "barrier",
+      "golden": "tfq_barrier",
+      "params": {
+        "spot": 100,
+        "strike": 110,
+        "barrier": 85,
+        "expiry": 1.0,
+        "volatility": 0.25,
+        "rate": 0.05,
+        "dividend": 0.02,
+        "option_type": "call",
+        "barrier_type": "down-and-in"
+      }
+    },
+    {
+      "id": "tfq_barrier_uiki_put",
+      "model": "barrier",
+      "golden": "tfq_barrier",
+      "params": {
+        "spot": 100,
+        "strike": 90,
+        "barrier": 125,
+        "expiry": 1.0,
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.02,
+        "option_type": "put",
+        "barrier_type": "up-and-in"
+      }
+    },
+    {
+      "id": "tfq_binary_call",
+      "model": "binary",
+      "golden": "tfq_binary",
+      "params": {
+        "spot": 100,
+        "strike": 100,
+        "expiry": 1.0,
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.02,
+        "option_type": "call"
+      }
+    },
+    {
+      "id": "tfq_binary_put",
+      "model": "binary",
+      "golden": "tfq_binary",
+      "params": {
+        "spot": 100,
+        "strike": 110,
+        "expiry": 2.0,
+        "volatility": 0.3,
+        "rate": 0.05,
+        "dividend": 0.02,
+        "option_type": "put"
+      }
+    },
+    {
+      "id": "tfq_pde_eu_call",
+      "model": "pde_eu",
+      "golden": "tfq_pde",
+      "params": {
+        "spot": 100,
+        "strike": 100,
+        "expiry": 1.0,
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.02,
+        "option_type": "call",
+        "s_max": 300,
+        "num_grid_points": 400,
+        "time_step": 0.005
+      }
+    },
+    {
+      "id": "tfq_swapcurve_flat",
+      "model": "swap_curve",
+      "golden": "tfq_swapcurve",
+      "params": {
+        "flat_rate": 0.03,
+        "swap_maturities": [
+          1.0,
+          2.0,
+          3.0,
+          4.0
+        ],
+        "test_maturities": [
+          0.5,
+          1.0,
+          2.0,
+          3.0,
+          4.0
+        ]
+      }
     }
   ]
 }
