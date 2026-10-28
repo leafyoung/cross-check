@@ -8,10 +8,13 @@ Run from the tf-quant-finance repo dir so `uv run` picks up its env:
 
 Writes results/tfquant-<platform>.json (cross-check/results/). Never imports
 tf_quant_finance.experimental.pricing_platform (hipSparse crash — repo rule).
-tf-quant overlap with the case catalog: BSM vanilla (European) and CRR binomial
-(European/American). Everything else is marked skipped (no tf-quant equivalent
-in scope: no Bermudan tree, no Heston analytic, no SABR Hagan IV, no ZCB closed
-forms, no exotics/risk modules).
+tf-quant scope in the catalog: BSM vanilla, CRR binomial, implied vol,
+analytic Asian/barrier/binary, PDE European, swap-curve bootstrap, and the
+six tfqr_ rates families (Hagan-West bootstrap + monotone convex, NSS fit via
+tff's BFGS over its NSS interpolation, forwards/cashflow identities).
+Everything else is marked skipped (no tf-quant equivalent in scope: no
+Bermudan tree, no Heston analytic, no SABR Hagan IV, no one-factor ZCB closed
+forms, no MC exotics/risk modules).
 """
 import json
 import sys
@@ -20,11 +23,19 @@ from pathlib import Path
 import jax
 jax.config.update("jax_enable_x64", True)
 import jax.numpy as jnp
+import numpy as np
 
 from tf_quant_finance.black_scholes import option_price, implied_vol, implied_vol_approx, asian_option_price
 from tf_quant_finance.black_scholes.crr_binomial_tree import option_price_binomial
 from tf_quant_finance.black_scholes.vanilla_prices import barrier_price, binary_price
 from tf_quant_finance.math.pde import fd_solvers, grids, boundary_conditions
+from tf_quant_finance.math import make_val_and_grad_fn
+from tf_quant_finance.math.optimizer import bfgs_minimize
+from tf_quant_finance.rates.hagan_west import bond_curve, monotone_convex
+from tf_quant_finance.rates.nelson_seigel_svensson import interpolate as nss_interpolate
+from tf_quant_finance.rates.nelson_seigel_svensson import SvenssonParameters
+from tf_quant_finance.rates.analytics import cashflows
+from tf_quant_finance.rates.analytics import forwards as fwd_analytics
 
 ROOT = Path(__file__).resolve().parent.parent
 RESULTS = ROOT / "results"
@@ -36,6 +47,8 @@ SUPPORTED = {
     "tfq_barrier_doko_call", "tfq_barrier_uoko_put",
     "tfq_barrier_diki_call", "tfq_barrier_uiki_put",
     "tfq_binary_call", "tfq_binary_put", "tfq_pde_eu_call", "tfq_swapcurve_flat",
+    "tfqr_hw_bondcurve", "tfqr_hw_monotone", "tfqr_hw_zcb",
+    "tfqr_nss_fit", "tfqr_forwards", "tfqr_cashflows",
 }
 
 
@@ -197,6 +210,136 @@ def price_swap_curve(p):
     return {"dfs": dfs}
 
 
+def price_hw_bondcurve(p):
+    """tff Hagan-West bond-curve bootstrap (monotone convex basis)."""
+    res = bond_curve(
+        [np.array(c, dtype=np.float64) for c in p["bond_cashflows"]],
+        [np.array(t, dtype=np.float64) for t in p["bond_cashflow_times"]],
+        np.array(p["present_values"], dtype=np.float64), dtype=np.float64)
+    return {"rates": [float(r) for r in res.discount_rates],
+            "dfs": [float(d) for d in res.discount_factors]}
+
+
+def price_hw_monotone(p):
+    """tff monotone-convex interpolation: forwards (plain + negative-forward
+    stress curve) and yields off the paper yield curve."""
+    yc = p["yields_curve"]
+    y_vals = monotone_convex.interpolate_yields(
+        jnp.array(yc["query_times"]), jnp.array(yc["reference_times"]),
+        yields=jnp.array(yc["yields"]), dtype=jnp.float64)
+    fc = p["fwd_curve"]
+    f_vals = monotone_convex.interpolate_forward_rate(
+        jnp.array(fc["query_times"]), jnp.array(fc["reference_times"]),
+        discrete_forwards=jnp.array(fc["forwards"]), dtype=jnp.float64)
+    fn = p["fwd_curve_neg"]
+    fn_vals = monotone_convex.interpolate_forward_rate(
+        jnp.array(fn["query_times"]), jnp.array(fn["reference_times"]),
+        discrete_forwards=jnp.array(fn["forwards"]), dtype=jnp.float64)
+    # yields from discrete forwards (internally converts forwards->yields)
+    yn_vals = monotone_convex.interpolate_yields(
+        jnp.array(fn["query_times"]), jnp.array(fn["reference_times"]),
+        discrete_forwards=jnp.array(fn["forwards"]), dtype=jnp.float64)
+    return {"forwards": [float(v) for v in f_vals],
+            "yields": [float(v) for v in y_vals],
+            "fwd_neg": [float(v) for v in fn_vals],
+            "yld_neg": [float(v) for v in yn_vals]}
+
+
+def price_hw_zcb(p):
+    """tff Hagan-West bootstrap on a zero-coupon strip: node DFs are pinned
+    by the instrument prices (no interpolation freedom at nodes)."""
+    prm = p["nss_params"]
+
+    def nss(t):
+        h1 = (1 - jnp.exp(-t / prm["tau1"])) / (t / prm["tau1"])
+        h2 = (1 - jnp.exp(-t / prm["tau2"])) / (t / prm["tau2"])
+        return (prm["beta0"] + prm["beta1"] * h1 +
+                prm["beta2"] * (h1 - jnp.exp(-t / prm["tau1"])) +
+                prm["beta3"] * (h2 - jnp.exp(-t / prm["tau2"])))
+
+    ts = [d / 365.0 for d in p["zcb_days"]]
+    dfs_true = [float(jnp.exp(-nss(_t64(t)) * t)) for t in ts]
+    res = bond_curve(
+        [np.array([p["face"]]) for _ in ts],
+        [np.array([t]) for t in ts],
+        np.array([p["face"] * d for d in dfs_true], dtype=np.float64),
+        dtype=np.float64)
+    return {"dfs": [float(d) for d in res.discount_factors]}
+
+
+def price_nss_fit(p):
+    """Fit NSS parameters to synthetic yields with tff's BFGS over tff's
+    NSS interpolation (tff ships the parametric form; the least-squares fit
+    is harness-side). taus are fitted in log space to keep them positive.
+    Compare fitted CURVE VALUES at the test maturities (fit tenors), not the
+    (non-unique) parameters themselves."""
+    prm = p["true_params"]
+
+    def nss_py(t):
+        h1 = (1 - jnp.exp(-t / prm["tau1"])) / (t / prm["tau1"])
+        h2 = (1 - jnp.exp(-t / prm["tau2"])) / (t / prm["tau2"])
+        return (prm["beta0"] + prm["beta1"] * h1 +
+                prm["beta2"] * (h1 - jnp.exp(-t / prm["tau1"])) +
+                prm["beta3"] * (h2 - jnp.exp(-t / prm["tau2"])))
+
+    tt = jnp.array(p["fit_tenors"])
+    yy = jnp.array([float(nss_py(t)) for t in p["fit_tenors"]])
+
+    @make_val_and_grad_fn
+    def loss(u):
+        sp = SvenssonParameters(beta_0=u[0], beta_1=u[1], beta_2=u[2],
+                                beta_3=u[3], tau_1=jnp.exp(u[4]),
+                                tau_2=jnp.exp(u[5]))
+        return jnp.mean((nss_interpolate(tt, sp) - yy) ** 2)
+
+    res = bfgs_minimize(loss, jnp.array(p["fit_start"], dtype=jnp.float64),
+                        tolerance=1e-12, max_iterations=500)
+    u = res.position
+    sp = SvenssonParameters(beta_0=u[0], beta_1=u[1], beta_2=u[2], beta_3=u[3],
+                            tau_1=jnp.exp(u[4]), tau_2=jnp.exp(u[5]))
+    test_ts = [p["fit_tenors"][i] for i in p["test_indices"]]
+    fitted = nss_interpolate(jnp.array(test_ts), sp)
+    return {"yields": [float(v) for v in fitted]}
+
+
+def price_fwd_identities(p):
+    """forwards.from_yields / to_yields / from_discount_factors identities."""
+    prm = p["nss_params"]
+
+    def nss(t):
+        h1 = (1 - jnp.exp(-t / prm["tau1"])) / (t / prm["tau1"])
+        h2 = (1 - jnp.exp(-t / prm["tau2"])) / (t / prm["tau2"])
+        return (prm["beta0"] + prm["beta1"] * h1 +
+                prm["beta2"] * (h1 - jnp.exp(-t / prm["tau1"])) +
+                prm["beta3"] * (h2 - jnp.exp(-t / prm["tau2"])))
+
+    ts = jnp.array(p["times"])
+    ys = nss(ts)
+    fwds = fwd_analytics.forward_rates_from_yields(ys, ts, dtype=jnp.float64)
+    back = fwd_analytics.yields_from_forward_rates(fwds, ts, dtype=jnp.float64)
+    dfs = jnp.exp(-ys * ts)
+    df_fwd = fwd_analytics.forward_rates(
+        dfs[:-1], dfs[1:], ts[1:] - ts[:-1], dtype=jnp.float64)
+    return {"fwd": [float(v) for v in fwds],
+            "roundtrip": [float(v) for v in back],
+            "df_fwd": [float(v) for v in df_fwd]}
+
+
+def price_cashflow_identities(p):
+    """rates.analytics.cashflows: PV at flat yield, Newton yield recovery,
+    PV from explicit discount factors."""
+    ts = jnp.array(p["cashflow_times"])
+    cfs = jnp.array([p["coupon"]] * (len(ts) - 1) + [p["final_cashflow"]])
+    y = _t64(p["flat_yield"])
+    pv = cashflows.pv_from_yields(cfs, ts, jnp.array([y]), dtype=jnp.float64)
+    y_rec = cashflows.yields_from_pv(cfs, ts, pv, dtype=jnp.float64)
+    dfs = jnp.exp(-y * ts)
+    pv2 = cashflows.present_value(cfs[None, :], dfs[None, :],
+                                  dtype=jnp.float64)
+    return {"pv": [float(pv[0])], "yield": [float(y_rec[0])],
+            "pv_dfs": [float(pv2[0])]}
+
+
 MODEL_DISPATCH = {
     "iv": price_iv,
     "asian_analytic": price_asian_analytic,
@@ -204,6 +347,12 @@ MODEL_DISPATCH = {
     "binary": price_binary,
     "pde_eu": price_pde_eu,
     "swap_curve": price_swap_curve,
+    "hw_bondcurve": price_hw_bondcurve,
+    "hw_monotone": price_hw_monotone,
+    "hw_zcb": price_hw_zcb,
+    "nss_fit": price_nss_fit,
+    "fwd_id": price_fwd_identities,
+    "cf_id": price_cashflow_identities,
 }
 
 def price_case(model, p):
@@ -260,7 +409,8 @@ def main():
     out = {"backend": backend, "results": results}
     RESULTS.mkdir(exist_ok=True)
     (RESULTS / f"tfquant-{backend}.json").write_text(json.dumps(out, indent=2))
-    priced = sum(1 for r in results if r["ok"] and r.get("price") is not None)
+    priced = sum(1 for r in results if r["ok"] and
+                 (r.get("price") is not None or r.get("values")))
     skipped = sum(1 for r in results if r.get("skipped"))
     failed = [r["id"] for r in results if not r["ok"]]
     print(f"tfquant[{backend}] (devices: {platforms}): {priced} priced, {skipped} skipped, "

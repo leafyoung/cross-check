@@ -114,9 +114,13 @@ discount-order bug was 5e-4.
 - `ql.sabrVolatility` argument order is (strike, forward, expiry, ...).
 
 ### No QuantLib equivalent in scope (SKIP vs golden, compared lib-vs-lib)
-bermudan exercise-date variant, Asian MC, BK ZCB, digital/barrier/lookback MC,
-heston_mc. tf-quant scope: BSM vanilla + CRR binomial only (5 of 21 cases
-priced, 16 SKIP).
+bermudan exercise-date variant, Asian MC, BK ZCB, barrier MC,
+heston_mc. (digital/lookback got exact analytic goldens on 2026-10-29 — see
+the tfqm_ section; barrier stays MC-only vs golden because the family's
+discrete 128-path monitoring cannot be matched to the continuous analytic.)
+tf-quant scope as of 2026-10-29: 23 of 40 cases priced (BSM vanilla, CRR,
+implied vol, analytic Asian/barrier/binary, PDE, swap-curve bootstrap, and
+the six tfqr_ rates families).
 
 
 ## Coverage matrix (case × library)
@@ -138,13 +142,16 @@ in scope for that pairing.
 | Hull-White / Black-Karasinski ZCB | exact / skip⁵ | exact | exact | exact | skip⁴ | exact |
 | LMM, Dupire, GAN | — | exact (parity tests only) | exact | exact | — | exact |
 | Bonds (zero/coupon/callable/putable) | skip⁶ | exact | exact | exact | — | exact |
-| Exotics MC (digital/barrier/lookback) | skip⁷ | MC | MC | MC | — | MC |
+| Exotics MC (digital/barrier/lookback) | exact¹¹ (digital, lookback) / skip⁷ (barrier) | MC | MC | MC | — | MC |
 | Analytic barrier (continuous) | exact | skip⁸ | skip⁸ | skip⁸ | exact | skip⁸ |
 | Binary (cash-or-nothing, analytic) | exact | skip⁸ | skip⁸ | skip⁸ | exact | skip⁸ |
 | Asian analytic (geometric) | exact | skip⁸ | skip⁸ | skip⁸ | exact | skip⁸ |
 | Implied vol roundtrip | golden⁹ | letsberational¹⁰ | letsberational¹⁰ | letsberational¹⁰ | exact | skip |
 | PDE European | exact | — | — | — | exact | — |
 | Swap-curve bootstrap | exact | — | — | — | exact | — |
+| Hagan-West curve / monotone convex | pure-Py ref¹² | — | — | — | exact | — |
+| Nelson-Siegel-Svensson fit | true curve + QL Svensson¹² | — | — | — | exact | — |
+| forwards / cashflow identities | closed form | — | — | — | exact | — |
 | Greeks / VaR / ES / credit / XVA | — | MC/parity | MC/parity | MC/parity | — | MC/parity |
 
 ¹ Bermudan exercise-date variant has no QuantLib mapping in scope. ² tff's Bermudan is
@@ -154,6 +161,11 @@ no discountBond/tree; also QuantLib BK is curve-recalibrated — convention diff
 ⁶ QuantLib bond engines are curve-based, different convention. ⁷ quantlib MC golden not
 wired for these (quantburn/quantcandle/quantorch compare lib-vs-lib). ⁸ torchquantlib
 family prices these by MC only (exotics module); analytic variants exist only in tff.
+¹¹ analytic goldens added 2026-10-29 (tfqm_ section); the MC rows compare at the
+1e-2 rng tolerance (INFO(rng) with deviations shown). ¹² no QL monotone-convex
+builder — golden is an independent pure-Python Hagan-West reference (QL
+cross-checked on the ZCB-pinned basis and for the Svensson fit; see tfqr_
+section).
 ⁹ golden = true vol used to generate prices. ¹⁰ let's-be-rational is call-only IV (Brent/
 Newton on Black) — not wired into the case catalog (different API surface).
 
@@ -199,3 +211,87 @@ argument (documented contract).
 tf-quant capability, each with a stated reason). After quantjax joined
 (2026-10-28): 547 PASS / 0 FAIL — quantjax matches quantburn/quantcandle
 bit-exactly on all 21 shared models and rocm == cpu.
+
+## tf-quant rates (tfqr_) and MC goldens for exotics (2026-10-29)
+
+Catalog 34 → 40 cases: six `tfqr_` rates cases (tff `rates/` vs goldens) and
+two `tfqm_` analytic goldens attached to the existing `digital_call` /
+`lookback_call` MC cases. `compare.py` now (a) compares dict-of-vector
+payloads per key (any curve values, not just the old `dfs` shape) and (b)
+no longer drops stochastic cases from the golden table: MC rows against an
+exact golden are compared at the documented **1e-2 rng tolerance** with
+`PASS(rng)`/`INFO(rng)` verdicts — above tolerance the row stays visible
+with its deviation (same policy as lib-vs-lib MC rows; never masked).
+
+### tfqr_ rates cases (all PASS, 0 FAIL)
+
+| case | tff API | golden | rel err | tol |
+|---|---|---|---|---|
+| tfqr_hw_bondcurve | `rates.hagan_west.bond_curve` (HW 2008 paper's 4-bond example) | independent pure-Python HW reference in `golden_quantlib.py` | 4.0e-11 | 1e-6 |
+| tfqr_hw_monotone | `hagan_west.monotone_convex.interpolate_yields/interpolate_forward_rate` (incl. negative-forward curve) | same reference | 0.0 (exact) | 1e-9 |
+| tfqr_hw_zcb | `bond_curve` on a 6-point ZCB strip (day-aligned d/365 maturities, NSS true curve) | true DFs + QL `PiecewiseLogLinearDiscount` deposit bootstrap cross-check (1.2e-13) | 2.4e-16 | 1e-9 |
+| tfqr_nss_fit | NSS fit = harness-side L-BFGS (tff `math.optimizer.bfgs_minimize`) over tff `nelson_seigel_svensson.interpolate`, log-tau parametrization | true NSS curve at test points + QL `SvenssonFitting`/`FittedBondDiscountCurve` recovery cross-check (6e-13) | 2.6e-12 | 1e-9 |
+| tfqr_forwards | `rates.analytics.forwards`: forward_rates_from_yields / yields_from_forward_rates / forward_rates(DFs) | closed-form pure Python | 3.2e-15 | 1e-9 |
+| tfqr_cashflows | `rates.analytics.cashflows`: pv_from_yields / yields_from_pv / present_value | closed-form annuity + input yield | 1.2e-16 | 1e-8 |
+
+Tolerance justifications (also commented in `golden_quantlib.py`):
+- `tfqr_hw_bondcurve` 1e-6: both sides stop on the same 1e-8-discount-factor
+  iteration criterion from slightly different iterates; measured 4e-11,
+  headroom for the O(1e-8) stopping residual. Both curves re-price the input
+  bonds to <1e-9.
+- `tfqr_hw_monotone` 1e-9: identical closed-form scheme, independent code
+  paths; measured agreement exact.
+- `tfqr_hw_zcb` / `tfqr_nss_fit` / `tfqr_forwards` / `tfqr_cashflows` 1e-9
+  (cashflows 1e-8 for the Newton yield tolerance): exact identities or
+  machine-precision recovery on pinned quantities; measured 1e-16..1e-12.
+
+### QL-vs-Hagan-West scheme difference (documented, not a bug)
+QuantLib's pip surface has no monotone-convex builder; its
+`PiecewiseLogLinearDiscount` bootstraps log-linear discounts while Hagan-West
+interpolates instantaneous **forwards**. For coupon instruments the two bases
+give different node discount factors (the intermediate coupon DFs depend on
+the scheme), so golden-vs-QL is not meaningful for the HW bond bootstrap —
+hence the independent pure-Python reference (written from the Hagan-West
+2006/2008 papers; verified by interval-integral exactness 1e-17, endpoint
+continuity 5e-17, the paper's published bootstrap table to 9e-14, bond
+re-pricing 3e-12, and a single bootstrap step matching tff digit-for-digit).
+On the shared basis where both schemes are pinned — a zero-coupon strip, node
+DF = price/face — QL and tff agree to 2.4e-16 (`tfqr_hw_zcb`).
+
+### NSS notes
+tff ships the NSS **interpolation** only; the fit is harness-side (tff's own
+BFGS + interpolate, taus in log space to keep them positive). The synthetic
+data lies exactly on the model manifold and the compared test points are fit
+tenors, so the target is independent of the (non-unique) fitted parameters —
+tff recovers the true curve to 2.6e-12 and even the parameters themselves to
+~1e-6. QL's `SvenssonFitting` on ZCBs priced off the true curve recovers the
+curve to 6e-13 (asserted inside the golden; a mismatch raises as a FAIL).
+
+### tfqm_ MC goldens (digital_call / lookback_call)
+- **digital_call**: golden = QL analytic `CashOrNothingPayoff` (payout 10)
+  = 5.3232482 — exact analytic preferred over MC. Verified against the
+  pure-Python closed form `payout·e^{−rT}·N(d2)` (2e-15) and a 500k-sample
+  terminal-GBM MC (5.3258 ± 0.0067).
+- **lookback_call**: pip QuantLib 1.44 **does** expose
+  `AnalyticContinuousFixedLookbackEngine` (Conze-Viswanathan), so no SKIP was
+  needed. Golden = 19.1676253 with CONTINUOUS monitoring; verified against
+  the pure-Python CV formula (2e-14) and a 500k-sample 252-step MC:
+  18.375 ± 0.022.
+- **Convention finding (documented, not masked):** the torchquantlib-family
+  lookback MC monitors the running max/mini at 252 discrete steps/year, so
+  its expectation sits ~4.1% BELOW the continuous-monitoring golden —
+  quantitatively the Broadie-Glasserman-Kou discrete-monitoring adjustment
+  (e^{−0.5826·σ·√dt} ≈ −0.73% on the max, ≈ 0.82 on this price). All MC rows
+  (Xorshift64Star vs the analytic golden) land at `INFO(rng)` at the 1e-2
+  tolerance: digital 8.9% (burn family) / 3.0% (orch) against a 256-path
+  rel SE of ~5.6%; lookback 7.9% / 7.2% against a 128-path rel SE of ~7%.
+  Deviations are printed in the report rows; they are MC-noise-plus-monitoring-
+  convention, consistent with the 500k MC cross-checks above.
+
+### Final tallies (2026-10-29)
+vs golden: **107 PASS, 14 INFO(rng), 93 SKIP, 0 FAIL**. Lib-vs-lib: **323
+PASS, 75 PASS(rng), 30 INFO(rng), 48 PASS(f32), 0 FAIL**. SKIPs each carry a
+reason (no QL equivalent / no capability in that library). tff now prices 23
+of 40 cases; the remaining tff SKIPs are models tff does not have (Heston
+analytic, SABR Hagan, one-factor ZCB closed forms, MC exotics, tree
+Bermudan, chooser, bonds, BK).

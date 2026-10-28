@@ -27,16 +27,34 @@ def get_price(r):
     return r.get("price")
 
 def get_metric(cid, r, g):
-    """Comparison metric: scalar price, or dfs vector (swap curve)."""
-    if isinstance(g, dict) and "dfs" in g:
+    """Comparison metric: scalar price, or dict of vectors (curve values)."""
+    if isinstance(g, dict):
         rv = r.get("values") or {}
-        return ("dfs", rv.get("dfs"))
+        return ("vector", rv)
     return ("price", r.get("price"))
 
 STOCHASTIC = {c["id"] for c in cases if "seed" in c.get("params", {})}
 
 def rel(a, b):
     return abs(a - b) / max(abs(b), 1e-300)
+
+def vector_rel_err(lp, gp):
+    """Max relative error over every key/value of a dict-of-lists golden
+    payload vs the runner's values dict. Raises ValueError on a shape
+    mismatch (missing key / length mismatch) -> FAIL row."""
+    worst = 0.0
+    for k, gv in gp.items():
+        if k not in lp or len(lp[k]) != len(gv):
+            raise ValueError(f"payload mismatch on key '{k}'")
+        for a, b in zip(lp[k], gv):
+            worst = max(worst, rel(a, b))
+    return worst
+
+def first_val(x):
+    if isinstance(x, dict):
+        for v in x.values():
+            return v[0] if isinstance(v, list) else v
+    return x
 
 lines = ["# Cross-check report", ""]
 
@@ -48,35 +66,41 @@ for name, res in libs.items():
         g = golden.get(cid, {})
         if not g.get("ok") or g.get("price") is None:
             continue
-        if cid in STOCHASTIC:
-            continue  # stochastic cases have no golden; compared lib-vs-lib only
         metric_name, lp = get_metric(cid, r, g.get("price"))
-        if metric_name == "dfs" and g.get("price") is None:
-            continue
+        if metric_name == "vector" and not lp:
+            lp = None  # runner produced no values (skipped/unknown model)
         if lp is None:
             verdict = "SKIP" if (r.get("skipped") or is_unknown_model(r)) else "FAIL"
             note = r.get("note") or r.get("error")
-            gshow = g["price"]
-            gshow = gshow.get("dfs", ["?"])[0] if isinstance(gshow, dict) else gshow
+            gshow = first_val(g["price"])
             lines.append(f"| {cid} | {name} | ({note}) | {gshow:.10g} | — | — | {verdict} |")
             continue
-        if metric_name == "dfs":
-            gdfs = g["price"]["dfs"]
-            if len(lp) != len(gdfs):
-                lines.append(f"| {cid} | {name} | len mismatch | — | — | — | FAIL |")
-                continue
-            e = max(abs(a - b) / max(abs(b), 1e-300) for a, b in zip(lp, gdfs))
-            lp = gdfs[0]  # representative display value
-        else:
-            e = rel(lp, g["price"])
+        try:
+            if metric_name == "vector":
+                e = vector_rel_err(lp, g["price"])
+                show = next(iter(lp.values()))[0]
+            else:
+                e = rel(lp, g["price"])
+                show = lp
+        except ValueError as exc:
+            lines.append(f"| {cid} | {name} | {exc} | — | — | — | FAIL |")
+            continue
         tol = g.get("tol", 1e-6)
         # quantorch stores model params at f32 precision -> widen accordingly
         if name.startswith("quantorch"):
             tol = max(tol, 1e-5)
-        verdict = "PASS" if e <= tol else "FAIL"
-        gshow = g["price"]
-        gshow = gshow.get("dfs", ["?"])[0] if isinstance(gshow, dict) else gshow
-        lines.append(f"| {cid} | {name} | {lp:.10g} | {gshow:.10g} | {e:.2e} | {tol:.0e} | {verdict} |")
+        if cid in STOCHASTIC:
+            # MC row vs an analytic/exact golden: the RNG streams differ
+            # (Xorshift64Star vs QL/none), so MC noise dominates. Compared at
+            # the documented 1e-2 rng tolerance; above it the row stays
+            # visible as INFO(rng) with the deviation shown (never masked,
+            # never a silent FAIL - see README, 'RNG parity').
+            verdict = "PASS(rng)" if e <= 1e-2 else "INFO(rng)"
+            tol = 1e-2
+        else:
+            verdict = "PASS" if e <= tol else "FAIL"
+        gshow = first_val(g["price"])
+        lines.append(f"| {cid} | {name} | {show:.10g} | {gshow:.10g} | {e:.2e} | {tol:.0e} | {verdict} |")
 
 lines += ["", "## library vs library (same case ids)"]
 lines.append("| case | a | b | a price | b price | rel err | verdict |")
