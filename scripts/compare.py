@@ -16,7 +16,10 @@ libs = {}
 for f in sorted(res_dir.glob("*.json")):
     if f.stem == "quantlib":
         continue
-    libs[f.stem] = {r["id"]: r for r in json.loads(f.read_text())["results"]}
+    payload = json.loads(f.read_text())
+    if "results" not in payload:
+        continue  # not a runner output (e.g. calibration.json)
+    libs[f.stem] = {r["id"]: r for r in payload["results"]}
 
 def is_unknown_model(r):
     return (not r["ok"]) and str(r.get("error", "")).find("unknown model") >= 0

@@ -29,6 +29,12 @@
 | tfq_binary_put | quantburn-cpu | (unknown model 'binary') | 0.5575066596 | — | — | SKIP |
 | tfq_pde_eu_call | quantburn-cpu | (unknown model 'pde_eu') | 9.227498466 | — | — | SKIP |
 | tfq_swapcurve_flat | quantburn-cpu | (unknown model 'swap_curve') | 0.9924722288 | — | — | SKIP |
+| tfqr_hw_bondcurve | quantburn-cpu | (unknown model 'hw_bondcurve') | 0.05 | — | — | SKIP |
+| tfqr_hw_monotone | quantburn-cpu | (unknown model 'hw_monotone') | 0.04978 | — | — | SKIP |
+| tfqr_hw_zcb | quantburn-cpu | (unknown model 'hw_zcb') | 0.9903784487 | — | — | SKIP |
+| tfqr_nss_fit | quantburn-cpu | (unknown model 'nss_fit') | 0.05063259234 | — | — | SKIP |
+| tfqr_forwards | quantburn-cpu | (unknown model 'fwd_id') | 0.04357664045 | — | — | SKIP |
+| tfqr_cashflows | quantburn-cpu | (unknown model 'cf_id') | 911.0272147 | — | — | SKIP |
 | bsm_eu_call | quantburn-vulkan | 9.227005508 | 9.227005508 | 2.70e-15 | 1e-06 | PASS |
 | bsm_eu_put | quantburn-vulkan | 6.330080628 | 6.330080628 | 1.40e-16 | 1e-06 | PASS |
 | crr_eu_call | quantburn-vulkan | 10.43061166 | 10.42998595 | 6.00e-05 | 1e-04 | PASS |
@@ -55,6 +61,12 @@
 | tfq_binary_put | quantburn-vulkan | (unknown model 'binary') | 0.5575066596 | — | — | SKIP |
 | tfq_pde_eu_call | quantburn-vulkan | (unknown model 'pde_eu') | 9.227498466 | — | — | SKIP |
 | tfq_swapcurve_flat | quantburn-vulkan | (unknown model 'swap_curve') | 0.9924722288 | — | — | SKIP |
+| tfqr_hw_bondcurve | quantburn-vulkan | (unknown model 'hw_bondcurve') | 0.05 | — | — | SKIP |
+| tfqr_hw_monotone | quantburn-vulkan | (unknown model 'hw_monotone') | 0.04978 | — | — | SKIP |
+| tfqr_hw_zcb | quantburn-vulkan | (unknown model 'hw_zcb') | 0.9903784487 | — | — | SKIP |
+| tfqr_nss_fit | quantburn-vulkan | (unknown model 'nss_fit') | 0.05063259234 | — | — | SKIP |
+| tfqr_forwards | quantburn-vulkan | (unknown model 'fwd_id') | 0.04357664045 | — | — | SKIP |
+| tfqr_cashflows | quantburn-vulkan | (unknown model 'cf_id') | 911.0272147 | — | — | SKIP |
 | bsm_eu_call | quantcandle-cpu | 9.227005508 | 9.227005508 | 2.70e-15 | 1e-06 | PASS |
 | bsm_eu_put | quantcandle-cpu | 6.330080628 | 6.330080628 | 1.40e-16 | 1e-06 | PASS |
 | crr_eu_call | quantcandle-cpu | 10.43061166 | 10.42998595 | 6.00e-05 | 1e-04 | PASS |
@@ -81,6 +93,12 @@
 | tfq_binary_put | quantcandle-cpu | (unknown model 'binary') | 0.5575066596 | — | — | SKIP |
 | tfq_pde_eu_call | quantcandle-cpu | (unknown model 'pde_eu') | 9.227498466 | — | — | SKIP |
 | tfq_swapcurve_flat | quantcandle-cpu | (unknown model 'swap_curve') | 0.9924722288 | — | — | SKIP |
+| tfqr_hw_bondcurve | quantcandle-cpu | (unknown model 'hw_bondcurve') | 0.05 | — | — | SKIP |
+| tfqr_hw_monotone | quantcandle-cpu | (unknown model 'hw_monotone') | 0.04978 | — | — | SKIP |
+| tfqr_hw_zcb | quantcandle-cpu | (unknown model 'hw_zcb') | 0.9903784487 | — | — | SKIP |
+| tfqr_nss_fit | quantcandle-cpu | (unknown model 'nss_fit') | 0.05063259234 | — | — | SKIP |
+| tfqr_forwards | quantcandle-cpu | (unknown model 'fwd_id') | 0.04357664045 | — | — | SKIP |
+| tfqr_cashflows | quantcandle-cpu | (unknown model 'cf_id') | 911.0272147 | — | — | SKIP |
 | bsm_eu_call | quantcandle-mkl | 9.227005508 | 9.227005508 | 2.70e-15 | 1e-06 | PASS |
 | bsm_eu_put | quantcandle-mkl | 6.330080628 | 6.330080628 | 1.40e-16 | 1e-06 | PASS |
 | crr_eu_call | quantcandle-mkl | 10.43061166 | 10.42998595 | 6.00e-05 | 1e-04 | PASS |
@@ -107,6 +125,12 @@
 | tfq_binary_put | quantcandle-mkl | (unknown model 'binary') | 0.5575066596 | — | — | SKIP |
 | tfq_pde_eu_call | quantcandle-mkl | (unknown model 'pde_eu') | 9.227498466 | — | — | SKIP |
 | tfq_swapcurve_flat | quantcandle-mkl | (unknown model 'swap_curve') | 0.9924722288 | — | — | SKIP |
+| tfqr_hw_bondcurve | quantcandle-mkl | (unknown model 'hw_bondcurve') | 0.05 | — | — | SKIP |
+| tfqr_hw_monotone | quantcandle-mkl | (unknown model 'hw_monotone') | 0.04978 | — | — | SKIP |
+| tfqr_hw_zcb | quantcandle-mkl | (unknown model 'hw_zcb') | 0.9903784487 | — | — | SKIP |
+| tfqr_nss_fit | quantcandle-mkl | (unknown model 'nss_fit') | 0.05063259234 | — | — | SKIP |
+| tfqr_forwards | quantcandle-mkl | (unknown model 'fwd_id') | 0.04357664045 | — | — | SKIP |
+| tfqr_cashflows | quantcandle-mkl | (unknown model 'cf_id') | 911.0272147 | — | — | SKIP |
 | bsm_eu_call | quantjax-cpu | 9.227005508 | 9.227005508 | 2.70e-15 | 1e-06 | PASS |
 | bsm_eu_put | quantjax-cpu | 6.330080628 | 6.330080628 | 1.40e-16 | 1e-06 | PASS |
 | crr_eu_call | quantjax-cpu | 10.43061166 | 10.42998595 | 6.00e-05 | 1e-04 | PASS |
@@ -133,6 +157,12 @@
 | tfq_binary_put | quantjax-cpu | (ValueError: unknown model 'binary') | 0.5575066596 | — | — | SKIP |
 | tfq_pde_eu_call | quantjax-cpu | (ValueError: unknown model 'pde_eu') | 9.227498466 | — | — | SKIP |
 | tfq_swapcurve_flat | quantjax-cpu | (ValueError: unknown model 'swap_curve') | 0.9924722288 | — | — | SKIP |
+| tfqr_hw_bondcurve | quantjax-cpu | (ValueError: unknown model 'hw_bondcurve') | 0.05 | — | — | SKIP |
+| tfqr_hw_monotone | quantjax-cpu | (ValueError: unknown model 'hw_monotone') | 0.04978 | — | — | SKIP |
+| tfqr_hw_zcb | quantjax-cpu | (ValueError: unknown model 'hw_zcb') | 0.9903784487 | — | — | SKIP |
+| tfqr_nss_fit | quantjax-cpu | (ValueError: unknown model 'nss_fit') | 0.05063259234 | — | — | SKIP |
+| tfqr_forwards | quantjax-cpu | (ValueError: unknown model 'fwd_id') | 0.04357664045 | — | — | SKIP |
+| tfqr_cashflows | quantjax-cpu | (ValueError: unknown model 'cf_id') | 911.0272147 | — | — | SKIP |
 | bsm_eu_call | quantjax-rocm | 9.227005508 | 9.227005508 | 2.70e-15 | 1e-06 | PASS |
 | bsm_eu_put | quantjax-rocm | 6.330080628 | 6.330080628 | 1.40e-16 | 1e-06 | PASS |
 | crr_eu_call | quantjax-rocm | 10.43061166 | 10.42998595 | 6.00e-05 | 1e-04 | PASS |
@@ -159,6 +189,12 @@
 | tfq_binary_put | quantjax-rocm | (ValueError: unknown model 'binary') | 0.5575066596 | — | — | SKIP |
 | tfq_pde_eu_call | quantjax-rocm | (ValueError: unknown model 'pde_eu') | 9.227498466 | — | — | SKIP |
 | tfq_swapcurve_flat | quantjax-rocm | (ValueError: unknown model 'swap_curve') | 0.9924722288 | — | — | SKIP |
+| tfqr_hw_bondcurve | quantjax-rocm | (ValueError: unknown model 'hw_bondcurve') | 0.05 | — | — | SKIP |
+| tfqr_hw_monotone | quantjax-rocm | (ValueError: unknown model 'hw_monotone') | 0.04978 | — | — | SKIP |
+| tfqr_hw_zcb | quantjax-rocm | (ValueError: unknown model 'hw_zcb') | 0.9903784487 | — | — | SKIP |
+| tfqr_nss_fit | quantjax-rocm | (ValueError: unknown model 'nss_fit') | 0.05063259234 | — | — | SKIP |
+| tfqr_forwards | quantjax-rocm | (ValueError: unknown model 'fwd_id') | 0.04357664045 | — | — | SKIP |
+| tfqr_cashflows | quantjax-rocm | (ValueError: unknown model 'cf_id') | 911.0272147 | — | — | SKIP |
 | bsm_eu_call | quantorch-cpu | 9.227005508 | 9.227005508 | 2.70e-15 | 1e-05 | PASS |
 | bsm_eu_put | quantorch-cpu | 6.330080628 | 6.330080628 | 1.40e-16 | 1e-05 | PASS |
 | crr_eu_call | quantorch-cpu | 10.43061166 | 10.42998595 | 6.00e-05 | 1e-04 | PASS |
@@ -185,6 +221,12 @@
 | tfq_binary_put | quantorch-cpu | (ValueError: unknown model 'binary') | 0.5575066596 | — | — | SKIP |
 | tfq_pde_eu_call | quantorch-cpu | (ValueError: unknown model 'pde_eu') | 9.227498466 | — | — | SKIP |
 | tfq_swapcurve_flat | quantorch-cpu | (ValueError: unknown model 'swap_curve') | 0.9924722288 | — | — | SKIP |
+| tfqr_hw_bondcurve | quantorch-cpu | (ValueError: unknown model 'hw_bondcurve') | 0.05 | — | — | SKIP |
+| tfqr_hw_monotone | quantorch-cpu | (ValueError: unknown model 'hw_monotone') | 0.04978 | — | — | SKIP |
+| tfqr_hw_zcb | quantorch-cpu | (ValueError: unknown model 'hw_zcb') | 0.9903784487 | — | — | SKIP |
+| tfqr_nss_fit | quantorch-cpu | (ValueError: unknown model 'nss_fit') | 0.05063259234 | — | — | SKIP |
+| tfqr_forwards | quantorch-cpu | (ValueError: unknown model 'fwd_id') | 0.04357664045 | — | — | SKIP |
+| tfqr_cashflows | quantorch-cpu | (ValueError: unknown model 'cf_id') | 911.0272147 | — | — | SKIP |
 | bsm_eu_call | tfquant-gpu | 9.227005508 | 9.227005508 | 0.00e+00 | 1e-06 | PASS |
 | bsm_eu_put | tfquant-gpu | 6.330080628 | 6.330080628 | 1.40e-16 | 1e-06 | PASS |
 | crr_eu_call | tfquant-gpu | 10.43061166 | 10.42998595 | 6.00e-05 | 1e-04 | PASS |
