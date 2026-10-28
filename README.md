@@ -118,6 +118,44 @@ heston_mc. tf-quant scope: BSM vanilla + CRR binomial only (5 of 21 cases
 priced, 16 SKIP).
 
 
+## Coverage matrix (case × library)
+
+Status per library: **exact** = analytic/closed-form path exercised; **MC** = Monte-Carlo
+path (seeded; compared lib-vs-lib at PASS(rng) tolerance, vs golden only where a golden
+exists at MC tolerance); **skip** = no equivalent (reason in findings below); **—** = not
+in scope for that pairing.
+
+| case family | quantlib (golden) | quantburn | quantcandle | quantorch | tf-quant | quantjax |
+|---|---|---|---|---|---|---|
+| BSM vanilla / Black-76 | exact | exact | exact | exact | exact | exact |
+| CRR binomial (Euro/Amer) | exact (1e-4 convention) | exact | exact | exact | exact | exact |
+| American/Bermudan tree | exact / skip¹ | exact | exact | exact | exact² | exact |
+| Heston analytic | exact | exact | exact | exact | skip³ | exact |
+| Heston MC | — | MC | MC | MC | — | MC |
+| SABR Hagan IV / price | exact / skip | exact | exact | exact | skip⁴ | exact |
+| Vasicek / CIR ZCB | exact | exact | exact | exact | skip⁴ | exact |
+| Hull-White / Black-Karasinski ZCB | exact / skip⁵ | exact | exact | exact | skip⁴ | exact |
+| LMM, Dupire, GAN | — | exact (parity tests only) | exact | exact | — | exact |
+| Bonds (zero/coupon/callable/putable) | skip⁶ | exact | exact | exact | — | exact |
+| Exotics MC (digital/barrier/lookback) | skip⁷ | MC | MC | MC | — | MC |
+| Analytic barrier (continuous) | exact | skip⁸ | skip⁸ | skip⁸ | exact | skip⁸ |
+| Binary (cash-or-nothing, analytic) | exact | skip⁸ | skip⁸ | skip⁸ | exact | skip⁸ |
+| Asian analytic (geometric) | exact | skip⁸ | skip⁸ | skip⁸ | exact | skip⁸ |
+| Implied vol roundtrip | golden⁹ | letsberational¹⁰ | letsberational¹⁰ | letsberational¹⁰ | exact | skip |
+| PDE European | exact | — | — | — | exact | — |
+| Swap-curve bootstrap | exact | — | — | — | exact | — |
+| Greeks / VaR / ES / credit / XVA | — | MC/parity | MC/parity | MC/parity | — | MC/parity |
+
+¹ Bermudan exercise-date variant has no QuantLib mapping in scope. ² tff's Bermudan is
+SKIP (no tree with exercise dates). ³ tff has no analytic Heston. ⁴ tff has no Hagan IV,
+one-factor ZCB closed forms. ⁵ BK golden infeasible via pip QuantLib-Python (SWIG exposes
+no discountBond/tree; also QuantLib BK is curve-recalibrated — convention difference).
+⁶ QuantLib bond engines are curve-based, different convention. ⁷ quantlib MC golden not
+wired for these (quantburn/quantcandle/quantorch compare lib-vs-lib). ⁸ torchquantlib
+family prices these by MC only (exotics module); analytic variants exist only in tff.
+⁹ golden = true vol used to generate prices. ¹⁰ let's-be-rational is call-only IV (Brent/
+Newton on Black) — not wired into the case catalog (different API surface).
+
 ## tf-quant ↔ QuantLib deep check (2026-10-28)
 
 Expanded the catalog from 21 to 34 cases (13 new `tfq_` cases) covering the full
