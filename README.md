@@ -10,6 +10,7 @@ diffed pairwise against the **QuantLib golden standard** and between libraries.
 | quantlib (golden, pip 1.44) | `scripts/golden_quantlib.py` | — |
 | quantburn (Rust/Burn) | `scripts/run_quantburn.py [--features vulkan]` | cpu, **vulkan** |
 | quantcandle (Rust/Candle) | `scripts/run_quantcandle.py [--features mkl]` | cpu, mkl |
+| quantjax (Python/JAX) | `../quantjax/.venv/bin/python -m quantjax.cli --cases cases.json` (rocm via the tf-quant uv env) | cpu, **rocm** |
 | quantorch (PyTorch) | `quantorch/.venv/bin/python scripts/run_quantorch.py` | cpu (lock pins PyPI torch — no ROCm wheel exists in it; this box has no NVIDIA GPU) |
 | tf-quant-finance (JAX) | `scripts/run_tfquant.py` via `uv run` from the tf-quant repo | **gpu** (ROCM) |
 
@@ -195,4 +196,6 @@ argument (documented contract).
 - `tff.asian_option_price` sampling_times shape is `[n] + batch_shape`.
 
 **Final: 292 PASS / 0 FAIL / 67 SKIP** (SKIP = no QuantLib equivalent or no
-tf-quant capability, each with a stated reason).
+tf-quant capability, each with a stated reason). After quantjax joined
+(2026-10-28): 547 PASS / 0 FAIL — quantjax matches quantburn/quantcandle
+bit-exactly on all 21 shared models and rocm == cpu.
