@@ -46,6 +46,7 @@ if (cd $TFQ && XLA_PYTHON_CLIENT_PREALLOCATE=false XLA_PYTHON_CLIENT_MEM_FRACTIO
       nice -n 19 uv run --project . python /tmp/qj_rocm_all.py \
       > "$ROCM_OUT"); then :; else FAILED+=(quantjax-rocm); echo "!!! quantjax-rocm FAILED (continuing)"; fi
 
+step invariants $PY scripts/invariants.py > /dev/null
 step compare $PY scripts/compare.py > /dev/null
 $PY scripts/compare.py 2>/dev/null | tail -1 || true
 
