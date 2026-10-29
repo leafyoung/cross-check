@@ -522,3 +522,59 @@ vs golden **107 PASS / 7 CONVENTION / 14 INFO(rng) / 136 SKIP / 0 FAIL**; lib-vs
 grew vs the morning tally because the quantburn-vulkan and quantcandle-mkl result
 files were added since the previous compare run; compare.py also now skips
 risk_golden.json — its rows are 'case'-keyed — instead of crashing on it.)
+
+
+## Close-out round (2026-10-30)
+
+- **Item 7 — BK golden SOLVED** (`295bffa`): pip QuantLib's
+  `BlackKarasinski` + `CallableZeroCouponBond` + `TreeCallableFixedRateBondEngine`
+  prices a ZCB off the BK trinomial tree (the earlier "infeasible" finding missed
+  the instrument, not the model). Tree converges to the curve DF at 400 steps
+  (5.2e-16); golden tolerance 1e-12 documented. New compare.py verdict:
+  **CONVENTION** (7 rows) — the family's BK integral (exp(−∫E[r]dt) from r0,
+  0.7106) vs QuantLib's curve-recalibrated convention (= curve DF, 0.8607) are
+  two different quantities under one name; both verified against independent
+  references.
+- **Item 6 — KO-rebate flag, premise CORRECTED** (all four repos): QuantLib's
+  AnalyticBarrierEngine pays KO rebates at HIT (proven by R vs R=0 probes +
+  400k-path Brownian-bridge MC) — the earlier "timing convention" was actually
+  tff's nonstandard b=(μ²+2σ²r)/σ² parameter vs the standard λ. The new
+  `rebate_paid_at_expiry` flag (default False = unchanged) implements the
+  mathematically correct expiry convention, QL-verified literals embedded.
+  BONUS pre-existing bug found: family DI-put K>B mask row applies a hit-style
+  rebate weight to a knock-in (documented, untouched).
+- **Item 5 — BGK continuous lookback** (all four repos): Broadie-Glasserman-Kou
+  correction (β=0.5826, max·e^{+βσ√dt}) lands within 0.008–0.36% of the
+  continuous golden vs −4.4–4.6% discrete. The price-level gap is the extremum
+  factor leveraged ~6x through moneyness.
+- **Item 4 — drift-centered lattice mode** (all four repos): optional
+  `lattice="drift_centered"` reproduces QuantLib's CRR literals BIT-EXACTLY
+  (Euro 10.429985954340486, Amer 6.0826182179030805); "crr" default unchanged.
+- **Item 3 — float64 calibration**: quantorch gains dtype plumbing
+  (set_dtype/to, default float32 unchanged). Float64 Heston recovery: every
+  param 2.2–3.2x better at matched wall time (+4.5%); with a fine lr tail it
+  reaches QL-LM-level recovery on sigma_v (5.9e-7).
+- **Item 2 — andersen_lake**: the OOM was mis-attributed; real cause is
+  unbounded interval doubling in gauss_kronrod's adaptive loop. Dormant
+  `max_intervals=65536` guard added (bit-identical on convergent paths);
+  documented in tff MIGRATION_STATUS (`54a15480`).
+- **Item 1 — swaption "negative-tau" DISPOSITION: misdiagnosed.** The parked
+  note was wrong: upstream's 0.22811866 is genuine — an independent pure-Python
+  reference of the upstream analytic path reproduces ALL FOUR expected values
+  exactly (the upstream `maturities < expiries → 0` branch is upstream TF, not
+  a migration artifact). Our analytic path already matched. The simulation
+  variant failed from THREE stacked porting bugs in the scan rewrite of
+  `_sample_paths` (dead keep_mask reads → NameError; swapped scan
+  carry/index args; boolean mask used as gather indices — the shim's gather
+  silently returns everything). Fixed (`bdb28c21`): swaption_test 12/12;
+  full tff suite **4 failed / 1349 passed** (from 6/1347; remaining four are
+  the documented semantic parks).
+- **Greeks bias FIXED** (all four repos): European delta/gamma/vega/theta/rho
+  now use verified LR/pathwise estimators (QL-verified at 500k paths: delta
+  ≤1.4e-3, gamma ≤1e-2); digital gamma weight corrected; barrier/lookback/
+  basket/asian marked BIASED/UNDER REVIEW with the recipe documented.
+- **Item 8/9** — baseline tags + housekeeping commits landed earlier this
+  round; all 6 repos re-bundled would capture the new state (backups at
+  ../pricing-backups are from the pre-round state).
+- **run_all.sh** — calibration_check is now phase-based and wired as four
+  steps; full pipeline: **553 PASS / 0 FAIL / 136 SKIP / 7 CONVENTION**.
