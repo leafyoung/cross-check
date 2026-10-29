@@ -264,7 +264,7 @@
 | tfqr_hw_bondcurve | tfquant-gpu | 0.05 | 0.05 | 3.98e-11 | 1e-06 | PASS |
 | tfqr_hw_monotone | tfquant-gpu | 0.04978 | 0.04978 | 0.00e+00 | 1e-09 | PASS |
 | tfqr_hw_zcb | tfquant-gpu | 0.9903784487 | 0.9903784487 | 2.41e-16 | 1e-09 | PASS |
-| tfqr_nss_fit | tfquant-gpu | 0.05063259234 | 0.05063259234 | 2.62e-12 | 1e-09 | PASS |
+| tfqr_nss_fit | tfquant-gpu | 0.05063259234 | 0.05063259234 | 2.64e-12 | 1e-09 | PASS |
 | tfqr_forwards | tfquant-gpu | 0.04357664045 | 0.04357664045 | 3.19e-15 | 1e-09 | PASS |
 | tfqr_cashflows | tfquant-gpu | 911.0272147 | 911.0272147 | 1.16e-16 | 1e-08 | PASS |
 
