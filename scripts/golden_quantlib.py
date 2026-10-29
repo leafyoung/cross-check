@@ -93,6 +93,87 @@ def golden_hull_white(p):
     return hw.discountBond(0.0, p["maturity"], p["r0"])
 
 
+# ---------------------------------------------------------------------------
+# Black-Karasinski golden. Two different conventions live under the name
+# "BK t=0 ZCB" (README: 'Black-Karasinski golden — two conventions, both
+# verified'):
+#   - QuantLib: ql.BlackKarasinski recalibrates itself to the initial term
+#     structure (the model's theta/x0 is fit to the curve), so its t=0 ZCB is
+#     the curve discount factor e^{-r0*T} up to tree discretization error.
+#     Route: a CallableZeroCouponBond (zero coupons, empty callability -
+#     i.e. a plain ZCB) priced by TreeCallableFixedRateBondEngine off the BK
+#     short-rate tree. This is the only model-based bond engine on the pip
+#     surface (DiscountingBondEngine is curve-only; BK itself exposes no
+#     discountBond - it is not one-factor-affine). Evidence the NPV comes
+#     from the tree, not the curve: the finite-step NPV depends on a/sigma
+#     (a=0.5, 50 steps: 6.6e-11 below the DF; a=0.1, sigma=0.05: 6e-11 above)
+#     and converges to the curve DF as steps grow.
+#   - torchquantlib family: numerical trapezoid integral of the expected
+#     lognormal short-rate path E[r_t] = exp(ln(r0)e^{-at} +
+#     sigma^2(1-e^{-2at})/(2a)) starting from r_t = r0, with NO curve
+#     recalibration (_bk_family_zcb below, n=100 points as in the runners).
+# The gap (0.8607 curve-DF vs 0.7106 integral, 17% rel) is a convention
+# difference, NOT a bug: compare.py renders it CONVENTION via the case's
+# "convention" flag in cases.json.
+# ---------------------------------------------------------------------------
+
+
+def _bk_family_zcb(a, sigma, r0, maturity, n):
+    """Independent pure-Python port of the torchquantlib family's BK
+    zero_coupon_bond_price (quantburn src/black_karasinski.rs):
+    exp(-trapezoid of E[r_t] dt), E[r_t] = exp(ln(r0)e^{-at} +
+    sigma^2(1-e^{-2at})/(2a)) over n points on [0, maturity]. Pure Python
+    floats; reproduces the f64 family runners (quantburn/quantcandle/
+    quantjax: 0.7105591541535006 at their n=100) bit-for-bit; quantorch's
+    0.7105591893196106 is the same integral in f32 (4.9e-8 rel, f32 tier)."""
+    if maturity <= 0.0:
+        return 1.0
+    a = max(a, 1e-12)
+    sigma = max(sigma, 0.0)
+    r = max(r0, 1e-8)
+    n = max(n, 2)
+    dt = maturity / (n - 1)
+    integral = 0.0
+    for i in range(n):
+        t = dt * i
+        mean_log_r = math.log(r) * math.exp(-a * t)
+        var_log_r = sigma * sigma * (1.0 - math.exp(-2.0 * a * t)) / max(2.0 * a, 1e-12)
+        w = 0.5 if (i == 0 or i == n - 1) else 1.0
+        integral += w * math.exp(mean_log_r + 0.5 * var_log_r) * dt
+    return math.exp(-integral)
+
+
+def golden_black_karasinski(p):
+    """BK t=0 ZCB golden under the QUANTLIB convention: the model is
+    recalibrated to the flat r0 curve, so the tree ZCB = curve DF
+    e^{-r0*T} up to tree discretization error. Tree-error sweep for the
+    case params (a=0.1, sigma=0.01, T=5), rel err vs the DF:
+      25 -> 8.5e-13, 50 -> 9.6e-14, 100 -> 1.1e-14, 200 -> 2.6e-15,
+      400 -> 5.2e-16, 800 -> 1.3e-15, 1600 -> 1.6e-12 (roundoff starts to
+      dominate the discretization), 3200 -> 6.7e-13, 6400 -> 5.8e-13.
+    400 steps chosen (measured 5.2e-16); tolerance = measured error x
+    ~2000 margin, still far below any real bug scale.
+    Cross-asserts (a mismatch raises and surfaces as a golden failure
+    rather than being masked):
+      - the pure-Python family-semantics reference reproduces the family
+        runner value 0.7105591541535006 (n=100) to 1e-12;
+      - the tree NPV/face is within 1e-10 of the curve DF."""
+    a, sigma, r0, T = p["a"], p["sigma"], p["r0"], p["maturity"]
+    fam = _bk_family_zcb(a, sigma, r0, T, 100)
+    fam_doc = 0.7105591541535006
+    if abs(fam - fam_doc) / fam_doc > 1e-12:
+        raise ValueError(f"family BK reference drifted: {fam!r} vs {fam_doc!r}")
+    bk = ql.BlackKarasinski(flat_curve(r0), a, sigma)
+    mat_date = CAL.advance(REF_DATE, int(round(T * 365)), ql.Days)
+    bond = ql.CallableZeroCouponBond(0, 100.0, CAL, mat_date, DAY_COUNT)
+    bond.setPricingEngine(ql.TreeCallableFixedRateBondEngine(bk, 400))
+    zcb = bond.NPV() / 100.0
+    df = math.exp(-r0 * (mat_date - REF_DATE) / 365.0)
+    if abs(zcb - df) / df > 1e-10:
+        raise ValueError(f"BK tree ZCB off the calibrated curve: {zcb!r} vs DF {df!r}")
+    return zcb
+
+
 
 def _bs_process(spot, r, q, vol):
     return ql.BlackScholesMertonProcess(
@@ -565,6 +646,7 @@ GOLDEN = {
     "vasicek": golden_vasicek,
     "cir": golden_cir,
     "hull_white": golden_hull_white,
+    "black_karasinski": golden_black_karasinski,
     "tfq_iv": golden_tfq_iv,
     "tfq_iv_approx": golden_tfq_iv,
     "tfq_asian_geo": golden_tfq_asian_geo,
@@ -605,12 +687,17 @@ GOLDEN = {
 # tfqm_digital / tfqm_lookback: analytic goldens; the compared rows are MC
 #   estimates from different RNG streams (256/128 paths), so compare.py
 #   applies the 1e-2 rng tolerance with PASS(rng)/INFO(rng) verdicts.
+# black_karasinski: BK-tree discretization vs the calibrated curve DF;
+#   measured 5.2e-16 at the chosen 400 steps (sweep in golden function doc);
+#   1e-12 = measured x ~2000 margin. The family rows exceed ANY tolerance
+#   here by construction (different convention) and render CONVENTION.
 GOLDEN_TOL = {"heston": 1e-5, "crr": 1e-4,
               "tfq_iv_approx": 1e-3, "tfq_pde": 5e-3,
               "tfqr_hw_bondcurve": 1e-6, "tfqr_hw_monotone": 1e-9,
               "tfqr_hw_zcb": 1e-9, "tfqr_nss_fit": 1e-9,
               "tfqr_forwards": 1e-9, "tfqr_cashflows": 1e-8,
-              "tfqm_digital": 1e-2, "tfqm_lookback": 1e-2}  # relative, else 1e-6
+              "tfqm_digital": 1e-2, "tfqm_lookback": 1e-2,
+              "black_karasinski": 1e-12}  # relative, else 1e-6
 
 
 def main():

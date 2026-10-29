@@ -19,6 +19,8 @@ for f in sorted(res_dir.glob("*.json")):
     payload = json.loads(f.read_text())
     if "results" not in payload:
         continue  # not a runner output (e.g. calibration.json)
+    if any("id" not in r for r in payload["results"]):
+        continue  # case-runner outputs key rows by 'id' (risk_golden.json does not)
     libs[f.stem] = {r["id"]: r for r in payload["results"]}
 
 def is_unknown_model(r):
@@ -37,6 +39,17 @@ def get_metric(cid, r, g):
     return ("price", r.get("price"))
 
 STOCHASTIC = {c["id"] for c in cases if "seed" in c.get("params", {})}
+
+def convention_reason(cid):
+    """Documented convention difference for a case (cases.json 'convention':
+    true + 'convention_reason'): the runner and the golden compute the same
+    named quantity under DIFFERENT conventions, so an over-tolerance row is
+    rendered CONVENTION (with the reason, never silently, never FAIL)."""
+    c = tol_of.get(cid) or {}
+    if not c.get("convention"):
+        return None
+    return (str(c.get("convention_reason") or "documented convention difference")
+            .replace("|", "/").replace("\n", " "))
 
 def rel(a, b):
     return abs(a - b) / max(abs(b), 1e-300)
@@ -102,6 +115,12 @@ for name, res in libs.items():
             tol = 1e-2
         else:
             verdict = "PASS" if e <= tol else "FAIL"
+            reason = convention_reason(cid)
+            if verdict == "FAIL" and reason:
+                # Flagged convention difference: render CONVENTION with the
+                # documented reason from the case entry - visible, counted,
+                # and explicitly not a FAIL (see README, BK section).
+                verdict = f"CONVENTION ({reason})"
         gshow = first_val(g["price"])
         lines.append(f"| {cid} | {name} | {show:.10g} | {gshow:.10g} | {e:.2e} | {tol:.0e} | {verdict} |")
 
@@ -136,5 +155,7 @@ for i in range(len(names)):
 report = "\n".join(lines) + "\n"
 (res_dir / "report.md").write_text(report)
 n_fail = report.count("| FAIL |")
+n_conv = report.count("CONVENTION (")
 print(report)
-print(f"report written to {res_dir / 'report.md'} ({n_fail} FAIL rows)")
+print(f"report written to {res_dir / 'report.md'} ({n_fail} FAIL rows, "
+      f"{n_conv} CONVENTION rows)")

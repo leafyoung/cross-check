@@ -15,6 +15,7 @@
 | vasicek_zcb_5y | quantburn-cpu | 0.8396917673 | 0.8396917673 | 0.00e+00 | 1e-06 | PASS |
 | cir_zcb_1y | quantburn-cpu | 0.9690627652 | 0.9690627652 | 0.00e+00 | 1e-06 | PASS |
 | hw_zcb_1y | quantburn-cpu | 0.9704455335 | 0.9704455335 | 8.38e-13 | 1e-06 | PASS |
+| bk_zcb_5y | quantburn-cpu | 0.7105591542 | 0.8607079764 | 1.74e-01 | 1e-12 | CONVENTION (two conventions under one name - QL BK recalibrates to the initial curve so its tree ZCB = flat-curve DF e^-0.03*5 = 0.860708 (tree discretization ~1e-15, tol 1e-12); the torchquantlib family integrates the expected lognormal short-rate path from r0 with no recalibration = 0.710559 (n=100 trapezoid, independently re-verified in pure Python). The ~17% rel gap is the convention, not a bug - see README 'Black-Karasinski golden' section) |
 | digital_call | quantburn-cpu | 5.796554306 | 5.323248155 | 8.89e-02 | 1e-02 | INFO(rng) |
 | lookback_call | quantburn-cpu | 17.65824239 | 19.16762526 | 7.87e-02 | 1e-02 | INFO(rng) |
 | tfq_iv_newton_call | quantburn-cpu | (unknown model 'iv') | 0.2 | — | — | SKIP |
@@ -47,6 +48,7 @@
 | vasicek_zcb_5y | quantburn-vulkan | 0.8396917673 | 0.8396917673 | 0.00e+00 | 1e-06 | PASS |
 | cir_zcb_1y | quantburn-vulkan | 0.9690627652 | 0.9690627652 | 0.00e+00 | 1e-06 | PASS |
 | hw_zcb_1y | quantburn-vulkan | 0.9704455335 | 0.9704455335 | 8.38e-13 | 1e-06 | PASS |
+| bk_zcb_5y | quantburn-vulkan | 0.7105591542 | 0.8607079764 | 1.74e-01 | 1e-12 | CONVENTION (two conventions under one name - QL BK recalibrates to the initial curve so its tree ZCB = flat-curve DF e^-0.03*5 = 0.860708 (tree discretization ~1e-15, tol 1e-12); the torchquantlib family integrates the expected lognormal short-rate path from r0 with no recalibration = 0.710559 (n=100 trapezoid, independently re-verified in pure Python). The ~17% rel gap is the convention, not a bug - see README 'Black-Karasinski golden' section) |
 | digital_call | quantburn-vulkan | 5.796554306 | 5.323248155 | 8.89e-02 | 1e-02 | INFO(rng) |
 | lookback_call | quantburn-vulkan | 17.65824239 | 19.16762526 | 7.87e-02 | 1e-02 | INFO(rng) |
 | tfq_iv_newton_call | quantburn-vulkan | (unknown model 'iv') | 0.2 | — | — | SKIP |
@@ -79,6 +81,7 @@
 | vasicek_zcb_5y | quantcandle-cpu | 0.8396917673 | 0.8396917673 | 0.00e+00 | 1e-06 | PASS |
 | cir_zcb_1y | quantcandle-cpu | 0.9690627652 | 0.9690627652 | 0.00e+00 | 1e-06 | PASS |
 | hw_zcb_1y | quantcandle-cpu | 0.9704455335 | 0.9704455335 | 8.38e-13 | 1e-06 | PASS |
+| bk_zcb_5y | quantcandle-cpu | 0.7105591542 | 0.8607079764 | 1.74e-01 | 1e-12 | CONVENTION (two conventions under one name - QL BK recalibrates to the initial curve so its tree ZCB = flat-curve DF e^-0.03*5 = 0.860708 (tree discretization ~1e-15, tol 1e-12); the torchquantlib family integrates the expected lognormal short-rate path from r0 with no recalibration = 0.710559 (n=100 trapezoid, independently re-verified in pure Python). The ~17% rel gap is the convention, not a bug - see README 'Black-Karasinski golden' section) |
 | digital_call | quantcandle-cpu | 5.796554306 | 5.323248155 | 8.89e-02 | 1e-02 | INFO(rng) |
 | lookback_call | quantcandle-cpu | 17.65824239 | 19.16762526 | 7.87e-02 | 1e-02 | INFO(rng) |
 | tfq_iv_newton_call | quantcandle-cpu | (unknown model 'iv') | 0.2 | — | — | SKIP |
@@ -111,6 +114,7 @@
 | vasicek_zcb_5y | quantcandle-mkl | 0.8396917673 | 0.8396917673 | 0.00e+00 | 1e-06 | PASS |
 | cir_zcb_1y | quantcandle-mkl | 0.9690627652 | 0.9690627652 | 0.00e+00 | 1e-06 | PASS |
 | hw_zcb_1y | quantcandle-mkl | 0.9704455335 | 0.9704455335 | 8.38e-13 | 1e-06 | PASS |
+| bk_zcb_5y | quantcandle-mkl | 0.7105591542 | 0.8607079764 | 1.74e-01 | 1e-12 | CONVENTION (two conventions under one name - QL BK recalibrates to the initial curve so its tree ZCB = flat-curve DF e^-0.03*5 = 0.860708 (tree discretization ~1e-15, tol 1e-12); the torchquantlib family integrates the expected lognormal short-rate path from r0 with no recalibration = 0.710559 (n=100 trapezoid, independently re-verified in pure Python). The ~17% rel gap is the convention, not a bug - see README 'Black-Karasinski golden' section) |
 | digital_call | quantcandle-mkl | 5.796554306 | 5.323248155 | 8.89e-02 | 1e-02 | INFO(rng) |
 | lookback_call | quantcandle-mkl | 17.65824239 | 19.16762526 | 7.87e-02 | 1e-02 | INFO(rng) |
 | tfq_iv_newton_call | quantcandle-mkl | (unknown model 'iv') | 0.2 | — | — | SKIP |
@@ -143,6 +147,7 @@
 | vasicek_zcb_5y | quantjax-cpu | 0.8396917673 | 0.8396917673 | 0.00e+00 | 1e-06 | PASS |
 | cir_zcb_1y | quantjax-cpu | 0.9690627652 | 0.9690627652 | 0.00e+00 | 1e-06 | PASS |
 | hw_zcb_1y | quantjax-cpu | 0.9704455335 | 0.9704455335 | 8.38e-13 | 1e-06 | PASS |
+| bk_zcb_5y | quantjax-cpu | 0.7105591542 | 0.8607079764 | 1.74e-01 | 1e-12 | CONVENTION (two conventions under one name - QL BK recalibrates to the initial curve so its tree ZCB = flat-curve DF e^-0.03*5 = 0.860708 (tree discretization ~1e-15, tol 1e-12); the torchquantlib family integrates the expected lognormal short-rate path from r0 with no recalibration = 0.710559 (n=100 trapezoid, independently re-verified in pure Python). The ~17% rel gap is the convention, not a bug - see README 'Black-Karasinski golden' section) |
 | digital_call | quantjax-cpu | 5.796554306 | 5.323248155 | 8.89e-02 | 1e-02 | INFO(rng) |
 | lookback_call | quantjax-cpu | 17.65824239 | 19.16762526 | 7.87e-02 | 1e-02 | INFO(rng) |
 | tfq_iv_newton_call | quantjax-cpu | (ValueError: unknown model 'iv') | 0.2 | — | — | SKIP |
@@ -175,6 +180,7 @@
 | vasicek_zcb_5y | quantjax-rocm | 0.8396917673 | 0.8396917673 | 0.00e+00 | 1e-06 | PASS |
 | cir_zcb_1y | quantjax-rocm | 0.9690627652 | 0.9690627652 | 0.00e+00 | 1e-06 | PASS |
 | hw_zcb_1y | quantjax-rocm | 0.9704455335 | 0.9704455335 | 8.38e-13 | 1e-06 | PASS |
+| bk_zcb_5y | quantjax-rocm | 0.7105591542 | 0.8607079764 | 1.74e-01 | 1e-12 | CONVENTION (two conventions under one name - QL BK recalibrates to the initial curve so its tree ZCB = flat-curve DF e^-0.03*5 = 0.860708 (tree discretization ~1e-15, tol 1e-12); the torchquantlib family integrates the expected lognormal short-rate path from r0 with no recalibration = 0.710559 (n=100 trapezoid, independently re-verified in pure Python). The ~17% rel gap is the convention, not a bug - see README 'Black-Karasinski golden' section) |
 | digital_call | quantjax-rocm | 5.796554306 | 5.323248155 | 8.89e-02 | 1e-02 | INFO(rng) |
 | lookback_call | quantjax-rocm | 17.65824239 | 19.16762526 | 7.87e-02 | 1e-02 | INFO(rng) |
 | tfq_iv_newton_call | quantjax-rocm | (ValueError: unknown model 'iv') | 0.2 | — | — | SKIP |
@@ -207,6 +213,7 @@
 | vasicek_zcb_5y | quantorch-cpu | 0.8396917582 | 0.8396917673 | 1.09e-08 | 1e-05 | PASS |
 | cir_zcb_1y | quantorch-cpu | 0.9690644145 | 0.9690627652 | 1.70e-06 | 1e-05 | PASS |
 | hw_zcb_1y | quantorch-cpu | 0.9704455137 | 0.9704455335 | 2.04e-08 | 1e-05 | PASS |
+| bk_zcb_5y | quantorch-cpu | 0.7105591893 | 0.8607079764 | 1.74e-01 | 1e-05 | CONVENTION (two conventions under one name - QL BK recalibrates to the initial curve so its tree ZCB = flat-curve DF e^-0.03*5 = 0.860708 (tree discretization ~1e-15, tol 1e-12); the torchquantlib family integrates the expected lognormal short-rate path from r0 with no recalibration = 0.710559 (n=100 trapezoid, independently re-verified in pure Python). The ~17% rel gap is the convention, not a bug - see README 'Black-Karasinski golden' section) |
 | digital_call | quantorch-cpu | 5.164878845 | 5.323248155 | 2.98e-02 | 1e-02 | INFO(rng) |
 | lookback_call | quantorch-cpu | 20.5508728 | 19.16762526 | 7.22e-02 | 1e-02 | INFO(rng) |
 | tfq_iv_newton_call | quantorch-cpu | (ValueError: unknown model 'iv') | 0.2 | — | — | SKIP |
@@ -239,6 +246,7 @@
 | vasicek_zcb_5y | tfquant-gpu | (no tf-quant equivalent in scope) | 0.8396917673 | — | — | SKIP |
 | cir_zcb_1y | tfquant-gpu | (no tf-quant equivalent in scope) | 0.9690627652 | — | — | SKIP |
 | hw_zcb_1y | tfquant-gpu | (no tf-quant equivalent in scope) | 0.9704455335 | — | — | SKIP |
+| bk_zcb_5y | tfquant-gpu | (no tf-quant equivalent in scope) | 0.8607079764 | — | — | SKIP |
 | digital_call | tfquant-gpu | (no tf-quant equivalent in scope) | 5.323248155 | — | — | SKIP |
 | lookback_call | tfquant-gpu | (no tf-quant equivalent in scope) | 19.16762526 | — | — | SKIP |
 | tfq_iv_newton_call | tfquant-gpu | 0.1999999993 | 0.2 | 3.29e-09 | 1e-06 | PASS |

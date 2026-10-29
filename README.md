@@ -80,19 +80,17 @@ are consistent with tiny-sample MC variance.
    (f32 output quantization). Test counts: quantorch 322 passed, quantburn 121
    (cpu + vulkan), quantcandle 123 — all green.
 
-### Black-Karasinski golden — infeasible via pip QuantLib-Python (investigated)
-pip QuantLib-Python's `BlackKarasinski` exposes neither `discountBond` (BK is
-not one-factor-affine, so there is no analytic form) nor tree/lattice
-construction from the SWIG surface, and there is no generic model-based ZCB
-engine (DiscountingBondEngine is curve-only; the Tree/Black callable-bond
-engines need callable instruments and recalibrate the model to the curve at
-t=0). Convention caveat for any future C++-level golden: QuantLib's BK is
-curve-recalibrated by construction, so its t=0 ZCB equals the flat-curve DF
-(e^{−0.03·5}=0.8607 for the case params) while torchquantlib's BK
-`zero_coupon_bond_price` is a numerical integral of the lognormal dynamics
-(0.7106) — a convention difference, not a bug. bk_zcb_5y stays SKIP vs golden
-and is compared lib-vs-lib (quantburn == quantcandle exactly; quantorch within
-the f32 tier).
+### Black-Karasinski golden — RESOLVED 2026-10-29 (was "infeasible via pip QuantLib-Python")
+
+The earlier investigation missed a route: pip QuantLib 1.44 DOES expose
+`CallableZeroCouponBond` + `TreeCallableFixedRateBondEngine`, which together price a
+plain zero-coupon bond (empty callability schedule) off the `ql.BlackKarasinski`
+short-rate tree. BK itself still exposes no `discountBond` (not one-factor-affine) and
+`DiscountingBondEngine` is curve-only — but the tree-engine route is a valid golden.
+bk_zcb_5y is now golden-priced under the QUANTLIB convention; the torchquantlib family
+rows render CONVENTION against it. Full route, tree-convergence measurement and the
+two-convention analysis: "Black-Karasinski golden — two conventions, both verified"
+section at the end.
 
 ### Remaining documented difference (NOT a bug; tolerance set at 1e-4)
 **CRR vs QuantLib (~6e-5 at 100 steps).** Convention difference, verified by
@@ -115,10 +113,11 @@ discount-order bug was 5e-4.
 - `ql.sabrVolatility` argument order is (strike, forward, expiry, ...).
 
 ### No QuantLib equivalent in scope (SKIP vs golden, compared lib-vs-lib)
-bermudan exercise-date variant, Asian MC, BK ZCB, barrier MC,
+bermudan exercise-date variant, Asian MC, barrier MC,
 heston_mc. (digital/lookback got exact analytic goldens on 2026-10-29 — see
 the tfqm_ section; barrier stays MC-only vs golden because the family's
-discrete 128-path monitoring cannot be matched to the continuous analytic.)
+discrete 128-path monitoring cannot be matched to the continuous analytic.
+BK ZCB got a golden on 2026-10-29 — see the BK section.)
 tf-quant scope as of 2026-10-29: 23 of 40 cases priced (BSM vanilla, CRR,
 implied vol, analytic Asian/barrier/binary, PDE, swap-curve bootstrap, and
 the six tfqr_ rates families).
@@ -140,7 +139,7 @@ in scope for that pairing.
 | Heston MC | — | MC | MC | MC | — | MC |
 | SABR Hagan IV / price | exact / skip | exact | exact | exact | skip⁴ | exact |
 | Vasicek / CIR ZCB | exact | exact | exact | exact | skip⁴ | exact |
-| Hull-White / Black-Karasinski ZCB | exact / skip⁵ | exact | exact | exact | skip⁴ | exact |
+| Hull-White / Black-Karasinski ZCB | exact / exact⁵ (convention) | exact | exact | exact | skip⁴ | exact |
 | LMM, Dupire, GAN | — | exact (parity tests only) | exact | exact | — | exact |
 | Bonds (zero/coupon/callable/putable) | skip⁶ | exact | exact | exact | — | exact |
 | Exotics MC (digital/barrier/lookback) | exact¹¹ (digital, lookback) / skip⁷ (barrier) | MC | MC | MC | — | MC |
@@ -157,8 +156,13 @@ in scope for that pairing.
 
 ¹ Bermudan exercise-date variant has no QuantLib mapping in scope. ² tff's Bermudan is
 SKIP (no tree with exercise dates). ³ tff has no analytic Heston. ⁴ tff has no Hagan IV,
-one-factor ZCB closed forms. ⁵ BK golden infeasible via pip QuantLib-Python (SWIG exposes
-no discountBond/tree; also QuantLib BK is curve-recalibrated — convention difference).
+one-factor ZCB closed forms. ⁵ BK golden = `CallableZeroCouponBond` (empty
+callability) priced by `TreeCallableFixedRateBondEngine` off
+`ql.BlackKarasinski`; the QL BK is curve-recalibrated, so the golden =
+flat-curve DF up to tree error (measured 5.2e-16 at 400 steps, tol 1e-12).
+The torchquantlib family computes a different convention
+(expected-lognormal-path integral from r0, 0.7106 vs 0.8607) — flagged
+`convention: true` in cases.json, rows render CONVENTION (see BK section).
 ⁶ QuantLib bond engines are curve-based, different convention. ⁷ quantlib MC golden not
 wired for these (quantburn/quantcandle/quantorch compare lib-vs-lib). ⁸ torchquantlib
 family prices these by MC only (exotics module); analytic variants exist only in tff.
@@ -449,3 +453,72 @@ greeks, European + digital). Widest gap: European gamma, 3.9e+2 rel at 20k
 paths (367x at the 1M limit) — the largest discrepancy found in this repo so
 far, and the first real bug in the torchquantlib family (all prior case-level
 pricing matched goldens).
+
+
+## Black-Karasinski golden — two conventions, both verified (2026-10-29)
+
+bk_zcb_5y had been golden-SKIP under the belief that the pip SWIG surface exposes no
+BK tree pricing. Wrong: the missing piece was never the model, it was the instrument —
+`ql.BlackKarasinski` alone exposes no `discountBond` (BK is not one-factor-affine), but
+pip 1.44 DOES expose `CallableZeroCouponBond` and `TreeCallableFixedRateBondEngine`,
+and a `CallableZeroCouponBond` with the default EMPTY callability schedule is a plain
+zero-coupon bond. Each step below was verified with a tiny probe script before wiring.
+
+Route (in `golden_quantlib.py::golden_black_karasinski`):
+- `ql.BlackKarasinski(FlatForward(3%) handle, a, sigma)` — QuantLib recalibrates the
+  model to the term structure (the theta/x0 path is fit to the curve); the supplied
+  a and sigma are kept.
+- `ql.CallableZeroCouponBond(0, 100.0, NullCalendar, maturity_date, Act/365F)`,
+  no callability dates, redemption 100.
+- `ql.TreeCallableFixedRateBondEngine(bk, 400)` — bond NPV/100 = ZCB off the BK
+  trinomial tree. Evidence the price comes from the tree, not a curve discount: the
+  finite-step NPV depends on a/sigma (a=0.5, 50 steps: 6.6e-11 below the curve DF;
+  a=0.1, sigma=0.05: 6e-11 above) and converges to the curve DF as steps grow.
+
+### Tree convergence (case params a=0.1, sigma=0.01, r0=0.03, T=5y; curve DF e^{-0.03*5} = 0.8607079764250578)
+
+| steps | 25 | 50 | 100 | 200 | 400 | 800 | 1600 | 3200 | 6400 |
+|---|---|---|---|---|---|---|---|---|---|
+| rel err vs DF | 8.5e-13 | 9.6e-14 | 1.1e-14 | 2.6e-15 | 5.2e-16 | 1.3e-15 | 1.6e-12 | 6.7e-13 | 5.8e-13 |
+
+Non-monotone: the discretization error sinks to machine noise around 200-800 steps and
+roundoff in the taller trees takes over again. Golden uses 400 steps (measured
+5.2e-16); golden tolerance 1e-12 = measured x ~2000 margin, still far below any real
+bug scale. The golden cross-asserts (a) tree NPV/face within 1e-10 of the curve DF and
+(b) the family reference below reproduces the family value — a mismatch raises and
+surfaces as a golden failure, never masked.
+
+### What each convention computes
+
+- **torchquantlib family** (quantburn/quantcandle/quantjax f64; quantorch f32):
+  P = exp(-∫₀ᵀ E[r_t]dt) where r_t follows the lognormal (log-OU) dynamics started at
+  r_t = r0, E[r_t] = exp(ln(r0)e^{-at} + σ²(1-e^{-2at})/(2a)), evaluated as a 100-point
+  trapezoid with NO term-structure recalibration. Value for the case params:
+  0.7105591541535006 — reproduced bit-for-bit by an independent pure-Python port of the
+  quantburn `zero_coupon_bond_price` algorithm (`_bk_family_zcb` in golden_quantlib.py;
+  pure Python floats, no library). quantorch's 0.7105591893196106 is the same n=100
+  integral in f32 (4.9e-8 rel — the f32 tier). Note this model's implied 5y ZCB yield
+  is ~6.9%, not the 3% input curve: the family never recalibrates to any curve.
+- **QuantLib**: the model is by construction recalibrated to the initial term
+  structure, so its t=0 ZCB equals the curve discount factor 0.860708 up to tree error
+  (the market-standard curve-consistent BK convention).
+
+The 1.74e-01 relative gap between 0.7106 and 0.8607 is this convention difference,
+NOT a bug — neither number is wrong for what its library computes.
+
+### Wiring and verdict rendering (2026-10-29 run)
+
+cases.json marks bk_zcb_5y with `"convention": true` + `"convention_reason"` (the
+documented reason, shown verbatim in the report row); `compare.py` renders any
+over-tolerance row of a flagged case as **CONVENTION (reason)** in the vs-golden table
+and counts it separately in the summary — visible, never FAIL, never silently dropped.
+Result: quantburn-cpu/vulkan, quantcandle-cpu/mkl, quantjax-cpu/rocm,
+quantorch-cpu all render CONVENTION (price 0.7105591/0.7105592 vs golden
+0.8607079764, rel 1.74e-01, tol 1e-12; the quantorch row keeps the documented f32
+widening); tfquant-gpu stays SKIP (tff has no BK); lib-vs-lib rows unchanged
+(f64 family 0.0 PASS, quantorch PASS(f32) 4.95e-08). Report tallies this round:
+vs golden **107 PASS / 7 CONVENTION / 14 INFO(rng) / 136 SKIP / 0 FAIL**; lib-vs-lib
+**446 PASS / 75 PASS(rng) / 48 PASS(f32) / 30 INFO(rng) / 0 FAIL**. (The row counts
+grew vs the morning tally because the quantburn-vulkan and quantcandle-mkl result
+files were added since the previous compare run; compare.py also now skips
+risk_golden.json — its rows are 'case'-keyed — instead of crashing on it.)

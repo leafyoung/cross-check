@@ -250,7 +250,9 @@
     {
       "id": "bk_zcb_5y",
       "model": "black_karasinski_zcb",
-      "golden": null,
+      "golden": "black_karasinski",
+      "convention": true,
+      "convention_reason": "two conventions under one name - QL BK recalibrates to the initial curve so its tree ZCB = flat-curve DF e^-0.03*5 = 0.860708 (tree discretization ~1e-15, tol 1e-12); the torchquantlib family integrates the expected lognormal short-rate path from r0 with no recalibration = 0.710559 (n=100 trapezoid, independently re-verified in pure Python). The ~17% rel gap is the convention, not a bug - see README 'Black-Karasinski golden' section",
       "params": {
         "a": 0.1,
         "sigma": 0.01,
