@@ -47,7 +47,11 @@ if (cd $TFQ && XLA_PYTHON_CLIENT_PREALLOCATE=false XLA_PYTHON_CLIENT_MEM_FRACTIO
       > "$ROCM_OUT"); then :; else FAILED+=(quantjax-rocm); echo "!!! quantjax-rocm FAILED (continuing)"; fi
 
 step invariants $PY scripts/invariants.py > /dev/null
-step calibration timeout 900 $PY scripts/calibration_check.py
+# calibration_check is phase-based; run all phases in sequence
+step calibration-generate timeout 300 $PY scripts/calibration_check.py generate
+step calibration-quantorch timeout 900 $PY scripts/calibration_check.py quantorch
+step calibration-qlfit timeout 300 $PY scripts/calibration_check.py qlfit
+step calibration-report timeout 120 $PY scripts/calibration_check.py report
 step compare $PY scripts/compare.py > /dev/null
 $PY scripts/compare.py 2>/dev/null | tail -1 || true
 
