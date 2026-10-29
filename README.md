@@ -27,6 +27,7 @@ diffed pairwise against the **QuantLib golden standard** and between libraries.
 .venv/bin/python scripts/run_quantcandle.py        # -> results/quantcandle-cpu.json
 .venv/bin/python scripts/run_quantcandle.py --features mkl
 .venv/bin/python scripts/compare.py                # -> results/report.md
+.venv/bin/python scripts/risk_golden.py            # -> results/risk_golden.json (needs ../quantjax and ../quantorch venvs)
 ```
 
 Env: `.venv` holds QuantLib (uv). Rust bins live in each repo (`src/bin/crosscheck.rs`),
@@ -152,7 +153,7 @@ in scope for that pairing.
 | Hagan-West curve / monotone convex | pure-Py ref¹² | — | — | — | exact | — |
 | Nelson-Siegel-Svensson fit | true curve + QL Svensson¹² | — | — | — | exact | — |
 | forwards / cashflow identities | closed form | — | — | — | exact | — |
-| Greeks / VaR / ES / credit / XVA | — | MC/parity | MC/parity | MC/parity | — | MC/parity |
+| Greeks / VaR / ES / credit / XVA | golden¹³ | MC/parity | MC/parity | MC/parity | — | MC/parity |
 
 ¹ Bermudan exercise-date variant has no QuantLib mapping in scope. ² tff's Bermudan is
 SKIP (no tree with exercise dates). ³ tff has no analytic Heston. ⁴ tff has no Hagan IV,
@@ -168,6 +169,9 @@ cross-checked on the ZCB-pinned basis and for the Svensson fit; see tfqr_
 section).
 ⁹ golden = true vol used to generate prices. ¹⁰ let's-be-rational is call-only IV (Brent/
 Newton on Black) — not wired into the case catalog (different API surface).
+¹³ risk_golden (2026-10-29): Merton exact, XVA SKIP (no QL engine), VaR/ES
+convention-checked vs RiskStatistics, family Malliavin greeks FAIL(bias) — see
+the risk-modules findings section below.
 
 ## tf-quant ↔ QuantLib deep check (2026-10-28)
 
@@ -350,3 +354,98 @@ memory-defense work (sitecustomize, conftest, AGENTS.md consolidation,
 removed the completed llm-refactor-plan.md).
 
 **Final: 553 PASS / 0 FAIL / 135 SKIP** (40 cases × 7 runners).
+
+## Risk modules vs QuantLib golden (2026-10-29)
+
+First independent verification of the torchquantlib family's risk modules
+(`scripts/risk_golden.py` -> `results/risk_golden.json`, 46 rows). These modules
+were previously only parity-tested family-internally, against reference
+generators sharing the same formulas and the same Xorshift64Star stream —
+near-tautological. Family channel: quantjax (bit-exact vs quantburn/quantcandle
+per the parity suite); greeks called with the documented family test seed 3001
+at 20k paths, plus a 1M-path convergence probe (seed 7). Goldens: QuantLib 1.44
+`BlackCalculator` / `RiskStatistics` + pure-Python closed forms, cross-asserted
+inside the script (a golden-source mismatch raises); the family's quantile
+convention is additionally pinned against upstream `torch.quantile` (quantorch
+venv, float64).
+
+### European/digital Malliavin greeks: FAIL(bias) — real estimator bug in all family repos
+
+| quantity | family @20k/3001 | QL analytic | rel gap | family 1M limit |
+|---|---|---|---|---|
+| delta | 93.9733 | 0.636831 | 1.5e+2 | 91.3232 (143x) |
+| gamma | 7.26868 | 0.0187620 | 3.9e+2 | 6.88057 (367x) |
+| vega | 7991.19 | 37.5240 | 2.1e+2 | 7746.22 (206x) |
+| theta | −230.131 | −6.41403 | 3.5e+1 | −224.229 (35x) |
+| rho | 1395.59 | 53.2325 | 2.5e+1 | 1375.66 (26x) |
+| digital delta | −0.142140 (sign flip) | 0.187620 | 1.8e+0 | −0.139705 |
+| digital gamma | 0.00294877 (sign flip) | −0.00328335 | 1.9e+0 | 0.00290367 |
+| digital vega | −33.2999 | −6.56671 | 4.1e+0 | −32.662 |
+
+Diagnosis: the original torchquantlib `MalliavinGreeks`
+(`quantorch/torchquantlib/core/risk/greeks/greeks.py`, ported verbatim into
+quantburn `src/greeks.rs`, quantcandle and quantjax) multiplies the PAYOFF by
+pathwise-derivative quantities of S_T (`Dt_ST = S_T·Z/√T`, `D_sigma_ST =
+S_T·(Z√T−σT)`, ...) where the Malliavin integration-by-parts weights require
+the duality step (move the derivative onto the weight). Example: the correct
+single-step GBM delta weight is `Z/(σ·S0·√T)` (the likelihood-ratio weight);
+the family uses `S_T·Z/(σ·S0·√T)` — an extra multiplicative S_T — and its
+vega/rho use the payoff where the payoff DERIVATIVE is required.
+
+Evidence that this is bias, not MC noise (all in the script's evidence rows):
+- the 1M-path family limits stay at 26x..367x the analytic value;
+- an independent correct-weight estimator (own derivation, own RNG, same
+  estimator class and path counts) converges to the QL analytic: 1e-3..2e-3
+  rel at 1M paths; its measured 20k-path noise floor is 1.3e-2 (vega) to
+  8.8e-2 (gamma) — the 1e-2 PASS(rng) screen is consistent with that floor,
+  and every family row exceeds it by 1-2 orders of magnitude;
+- for the digital delta, the independent pathwise-kernel estimator with the
+  family's own ε=2.0 kernel is within 0.4% of analytic (ε sweep 2.0/0.5/0.1
+  converges to analytic as ε→0) — the wide Gaussian-Dirac kernel is benign;
+  the weight is the bug.
+
+NOT fixed here (family repos are read-only in this workspace) — upstream
+finding for torchquantlib and all four ports. The internal 1e-6 parity tests
+pass because the reference generators encode the same formulas.
+
+### VaR / ES: PASS(exact) vs spec; CONVENTION vs QuantLib
+
+- vs the independent re-derivation of the documented semantics (losses =
+  max(−r,0); torch.quantile "linear"/type-7 quantile; ES = mean{losses≥VaR} +
+  1e-6·VaR): exact (0.0 rel) on both the 10-point family test sample and an
+  independent 250-point LCG sample, at p ∈ {0.90, 0.95, 0.99}; cross-asserted
+  against upstream `torch.quantile` (float64) to 1e-12. The family implements
+  exactly what it documents.
+- vs QL `RiskStatistics` fed the SAME samples (gains convention): pip
+  RiskStatistics exposes NO interpolation-type argument. The conventions were
+  established empirically and cross-asserted against the library to 1e-12:
+  QL `valueAtRisk(p)` = −min(sorted_gains[ceil(n·(1−p))−1], 0) — a ceil order
+  statistic with no interpolation; the family uses a linearly interpolated
+  (type-7) quantile of losses. QL `expectedShortfall(p)` = mean of gains
+  strictly below that order statistic (raises when the tail is empty — it does
+  on the 10-point sample; the family ES is reported unmasked); the family uses
+  mean{losses≥VaR} + 1e-6·VaR. Measured deviations on the 250-point sample:
+  VaR ≤ 2.5e-2 rel, ES ≤ 1.8e-2 rel — a quantified CONVENTION difference
+  (order statistic vs interpolation, strict-below vs ≥ tail), not a bug.
+
+### Merton structural model: PASS(exact)
+
+4 cases vs QL `BlackCalculator` + the closed form (golden sources cross-asserted
+to 1e-12): worst 7.0e-16 rel at tolerance 1e-10 (the family ships its own erfc
+implementation, hence not 1e-12).
+
+### XVA (CVA/DVA/FVA/MVA): SKIP(ql), PASS(exact) vs independent re-derivation
+
+No QuantLib engine maps to these single-period undiscounted expected-loss
+products (`MidPointCdsEngine` prices CDS spreads off a hazard curve — a
+different quantity). Golden = independent re-derivation of the documented
+closed forms: exact (1e-12) on all four.
+
+### Tallies
+
+46 rows: 20 PASS(exact), 1 PASS(rng), 5 INFO(rng) (correct-estimator noise-floor
+evidence at 20k), 12 CONVENTION (VaR/ES vs QL), 8 FAIL(bias) (family Malliavin
+greeks, European + digital). Widest gap: European gamma, 3.9e+2 rel at 20k
+paths (367x at the 1M limit) — the largest discrepancy found in this repo so
+far, and the first real bug in the torchquantlib family (all prior case-level
+pricing matched goldens).
