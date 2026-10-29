@@ -36,6 +36,8 @@
 | tfqr_nss_fit | quantburn-cpu | (unknown model 'nss_fit') | 0.05063259234 | — | — | SKIP |
 | tfqr_forwards | quantburn-cpu | (unknown model 'fwd_id') | 0.04357664045 | — | — | SKIP |
 | tfqr_cashflows | quantburn-cpu | (unknown model 'cf_id') | 911.0272147 | — | — | SKIP |
+| fam_asian_geo_atm | quantburn-cpu | 5.940200222 | 5.938216293 | 3.34e-04 | 1e-03 | PASS |
+| fam_asian_geo_otm | quantburn-cpu | 2.144327625 | 2.142733904 | 7.44e-04 | 1e-03 | PASS |
 | bsm_eu_call | quantburn-vulkan | 9.227005508 | 9.227005508 | 2.70e-15 | 1e-06 | PASS |
 | bsm_eu_put | quantburn-vulkan | 6.330080628 | 6.330080628 | 1.40e-16 | 1e-06 | PASS |
 | crr_eu_call | quantburn-vulkan | 10.43061166 | 10.42998595 | 6.00e-05 | 1e-04 | PASS |
@@ -102,6 +104,8 @@
 | tfqr_nss_fit | quantcandle-cpu | (unknown model 'nss_fit') | 0.05063259234 | — | — | SKIP |
 | tfqr_forwards | quantcandle-cpu | (unknown model 'fwd_id') | 0.04357664045 | — | — | SKIP |
 | tfqr_cashflows | quantcandle-cpu | (unknown model 'cf_id') | 911.0272147 | — | — | SKIP |
+| fam_asian_geo_atm | quantcandle-cpu | 5.940200222 | 5.938216293 | 3.34e-04 | 1e-03 | PASS |
+| fam_asian_geo_otm | quantcandle-cpu | 2.144327625 | 2.142733904 | 7.44e-04 | 1e-03 | PASS |
 | bsm_eu_call | quantcandle-mkl | 9.227005508 | 9.227005508 | 2.70e-15 | 1e-06 | PASS |
 | bsm_eu_put | quantcandle-mkl | 6.330080628 | 6.330080628 | 1.40e-16 | 1e-06 | PASS |
 | crr_eu_call | quantcandle-mkl | 10.43061166 | 10.42998595 | 6.00e-05 | 1e-04 | PASS |
@@ -168,6 +172,8 @@
 | tfqr_nss_fit | quantjax-cpu | (ValueError: unknown model 'nss_fit') | 0.05063259234 | — | — | SKIP |
 | tfqr_forwards | quantjax-cpu | (ValueError: unknown model 'fwd_id') | 0.04357664045 | — | — | SKIP |
 | tfqr_cashflows | quantjax-cpu | (ValueError: unknown model 'cf_id') | 911.0272147 | — | — | SKIP |
+| fam_asian_geo_atm | quantjax-cpu | 5.940200222 | 5.938216293 | 3.34e-04 | 1e-03 | PASS |
+| fam_asian_geo_otm | quantjax-cpu | 2.144327625 | 2.142733904 | 7.44e-04 | 1e-03 | PASS |
 | bsm_eu_call | quantjax-rocm | 9.227005508 | 9.227005508 | 2.70e-15 | 1e-06 | PASS |
 | bsm_eu_put | quantjax-rocm | 6.330080628 | 6.330080628 | 1.40e-16 | 1e-06 | PASS |
 | crr_eu_call | quantjax-rocm | 10.43061166 | 10.42998595 | 6.00e-05 | 1e-04 | PASS |
@@ -234,6 +240,8 @@
 | tfqr_nss_fit | quantorch-cpu | (ValueError: unknown model 'nss_fit') | 0.05063259234 | — | — | SKIP |
 | tfqr_forwards | quantorch-cpu | (ValueError: unknown model 'fwd_id') | 0.04357664045 | — | — | SKIP |
 | tfqr_cashflows | quantorch-cpu | (ValueError: unknown model 'cf_id') | 911.0272147 | — | — | SKIP |
+| fam_asian_geo_atm | quantorch-cpu | 5.940200222 | 5.938216293 | 3.34e-04 | 1e-03 | PASS |
+| fam_asian_geo_otm | quantorch-cpu | 2.144327625 | 2.142733904 | 7.44e-04 | 1e-03 | PASS |
 | bsm_eu_call | tfquant-gpu | 9.227005508 | 9.227005508 | 0.00e+00 | 1e-06 | PASS |
 | bsm_eu_put | tfquant-gpu | 6.330080628 | 6.330080628 | 1.40e-16 | 1e-06 | PASS |
 | crr_eu_call | tfquant-gpu | 10.43061166 | 10.42998595 | 6.00e-05 | 1e-04 | PASS |
@@ -313,6 +321,8 @@
 | barrier_uo | quantburn-cpu | quantcandle-cpu | 1.730618702 | 1.730618702 | 0.00e+00 | PASS(rng) |
 | lookback_call | quantburn-cpu | quantcandle-cpu | 17.65824239 | 17.65824239 | 0.00e+00 | PASS(rng) |
 | chooser | quantburn-cpu | quantcandle-cpu | 6.718645263 | 6.718645263 | 0.00e+00 | PASS |
+| fam_asian_geo_atm | quantburn-cpu | quantcandle-cpu | 5.940200222 | 5.940200222 | 0.00e+00 | PASS |
+| fam_asian_geo_otm | quantburn-cpu | quantcandle-cpu | 2.144327625 | 2.144327625 | 0.00e+00 | PASS |
 | bsm_eu_call | quantburn-cpu | quantcandle-mkl | 9.227005508 | 9.227005508 | 0.00e+00 | PASS |
 | bsm_eu_put | quantburn-cpu | quantcandle-mkl | 6.330080628 | 6.330080628 | 0.00e+00 | PASS |
 | crr_eu_call | quantburn-cpu | quantcandle-mkl | 10.43061166 | 10.43061166 | 0.00e+00 | PASS |
@@ -355,6 +365,8 @@
 | barrier_uo | quantburn-cpu | quantjax-cpu | 1.730618702 | 1.730618702 | 0.00e+00 | PASS(rng) |
 | lookback_call | quantburn-cpu | quantjax-cpu | 17.65824239 | 17.65824239 | 0.00e+00 | PASS(rng) |
 | chooser | quantburn-cpu | quantjax-cpu | 6.718645263 | 6.718645263 | 0.00e+00 | PASS |
+| fam_asian_geo_atm | quantburn-cpu | quantjax-cpu | 5.940200222 | 5.940200222 | 0.00e+00 | PASS |
+| fam_asian_geo_otm | quantburn-cpu | quantjax-cpu | 2.144327625 | 2.144327625 | 0.00e+00 | PASS |
 | bsm_eu_call | quantburn-cpu | quantjax-rocm | 9.227005508 | 9.227005508 | 0.00e+00 | PASS |
 | bsm_eu_put | quantburn-cpu | quantjax-rocm | 6.330080628 | 6.330080628 | 0.00e+00 | PASS |
 | crr_eu_call | quantburn-cpu | quantjax-rocm | 10.43061166 | 10.43061166 | 3.07e-15 | PASS |
@@ -397,6 +409,8 @@
 | barrier_uo | quantburn-cpu | quantorch-cpu | 1.730618702 | 1.089030385 | 5.89e-01 | INFO(rng) |
 | lookback_call | quantburn-cpu | quantorch-cpu | 17.65824239 | 20.5508728 | 1.41e-01 | INFO(rng) |
 | chooser | quantburn-cpu | quantorch-cpu | 6.718645263 | 6.718645263 | 0.00e+00 | PASS |
+| fam_asian_geo_atm | quantburn-cpu | quantorch-cpu | 5.940200222 | 5.940200222 | 2.39e-15 | PASS |
+| fam_asian_geo_otm | quantburn-cpu | quantorch-cpu | 2.144327625 | 2.144327625 | 1.45e-15 | PASS |
 | bsm_eu_call | quantburn-cpu | tfquant-gpu | 9.227005508 | 9.227005508 | 2.70e-15 | PASS |
 | bsm_eu_put | quantburn-cpu | tfquant-gpu | 6.330080628 | 6.330080628 | 0.00e+00 | PASS |
 | crr_eu_call | quantburn-cpu | tfquant-gpu | 10.43061166 | 10.43061166 | 5.65e-14 | PASS |
@@ -554,6 +568,8 @@
 | barrier_uo | quantcandle-cpu | quantjax-cpu | 1.730618702 | 1.730618702 | 0.00e+00 | PASS(rng) |
 | lookback_call | quantcandle-cpu | quantjax-cpu | 17.65824239 | 17.65824239 | 0.00e+00 | PASS(rng) |
 | chooser | quantcandle-cpu | quantjax-cpu | 6.718645263 | 6.718645263 | 0.00e+00 | PASS |
+| fam_asian_geo_atm | quantcandle-cpu | quantjax-cpu | 5.940200222 | 5.940200222 | 0.00e+00 | PASS |
+| fam_asian_geo_otm | quantcandle-cpu | quantjax-cpu | 2.144327625 | 2.144327625 | 0.00e+00 | PASS |
 | bsm_eu_call | quantcandle-cpu | quantjax-rocm | 9.227005508 | 9.227005508 | 0.00e+00 | PASS |
 | bsm_eu_put | quantcandle-cpu | quantjax-rocm | 6.330080628 | 6.330080628 | 0.00e+00 | PASS |
 | crr_eu_call | quantcandle-cpu | quantjax-rocm | 10.43061166 | 10.43061166 | 3.07e-15 | PASS |
@@ -596,6 +612,8 @@
 | barrier_uo | quantcandle-cpu | quantorch-cpu | 1.730618702 | 1.089030385 | 5.89e-01 | INFO(rng) |
 | lookback_call | quantcandle-cpu | quantorch-cpu | 17.65824239 | 20.5508728 | 1.41e-01 | INFO(rng) |
 | chooser | quantcandle-cpu | quantorch-cpu | 6.718645263 | 6.718645263 | 0.00e+00 | PASS |
+| fam_asian_geo_atm | quantcandle-cpu | quantorch-cpu | 5.940200222 | 5.940200222 | 2.39e-15 | PASS |
+| fam_asian_geo_otm | quantcandle-cpu | quantorch-cpu | 2.144327625 | 2.144327625 | 1.45e-15 | PASS |
 | bsm_eu_call | quantcandle-cpu | tfquant-gpu | 9.227005508 | 9.227005508 | 2.70e-15 | PASS |
 | bsm_eu_put | quantcandle-cpu | tfquant-gpu | 6.330080628 | 6.330080628 | 0.00e+00 | PASS |
 | crr_eu_call | quantcandle-cpu | tfquant-gpu | 10.43061166 | 10.43061166 | 5.65e-14 | PASS |
@@ -711,6 +729,8 @@
 | barrier_uo | quantjax-cpu | quantorch-cpu | 1.730618702 | 1.089030385 | 5.89e-01 | INFO(rng) |
 | lookback_call | quantjax-cpu | quantorch-cpu | 17.65824239 | 20.5508728 | 1.41e-01 | INFO(rng) |
 | chooser | quantjax-cpu | quantorch-cpu | 6.718645263 | 6.718645263 | 0.00e+00 | PASS |
+| fam_asian_geo_atm | quantjax-cpu | quantorch-cpu | 5.940200222 | 5.940200222 | 2.39e-15 | PASS |
+| fam_asian_geo_otm | quantjax-cpu | quantorch-cpu | 2.144327625 | 2.144327625 | 1.45e-15 | PASS |
 | bsm_eu_call | quantjax-cpu | tfquant-gpu | 9.227005508 | 9.227005508 | 2.70e-15 | PASS |
 | bsm_eu_put | quantjax-cpu | tfquant-gpu | 6.330080628 | 6.330080628 | 0.00e+00 | PASS |
 | crr_eu_call | quantjax-cpu | tfquant-gpu | 10.43061166 | 10.43061166 | 5.35e-14 | PASS |

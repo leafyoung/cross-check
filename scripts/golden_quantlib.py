@@ -189,6 +189,31 @@ def _ql_option(process, payoff_type, strike, expiry, engine):
     return opt
 
 
+
+def golden_fam_asian_geo(p):
+    """Family discrete-geometric Asian (analytical closed form, n monthly
+    fixings implied by the model's `steps`) vs QuantLib's exact discrete
+    geometric engine. The family's fixings are uniform at j*T/n; QL fixing
+    dates round to whole days -> residual date-grid misalignment ~1e-4;
+    tolerance 1e-3 documented. NOTE the case omits num_paths so the family
+    runners take the analytical path; `steps` in the case params controls n
+    (12 monthly fixings). All fam_ asian cases use q=0: the family's
+    geometric analytical form has no dividend parameter (upstream API
+    limitation — _geometric_asian_price takes no q), so a q>0 case would
+    measure that limitation, not the formula; documented in README."""
+    process = _bs_process(p["spot"], p["rate"], p["dividend"], p["volatility"])
+    n = int(p.get("steps", 12))
+    fixing_dates = ql.DateVector(
+        [CAL.advance(REF_DATE, int(round(j * p["expiry"] * 365 / n)), ql.Days) for j in range(1, n + 1)])
+    payoff = ql.PlainVanillaPayoff(
+        ql.Option.Call if p["option_type"] == "call" else ql.Option.Put, p["strike"])
+    option = ql.DiscreteAveragingAsianOption(
+        ql.Average.Geometric, 0.0, 0, fixing_dates, payoff,
+        ql.EuropeanExercise(expiry_date(p["expiry"])))
+    option.setPricingEngine(ql.AnalyticDiscreteGeometricAveragePriceAsianEngine(process))
+    return option.NPV()
+
+
 def golden_tfq_iv(p):
     """Implied-vol roundtrip: golden = the true vol used to generate the
     market price (the price constant in the case was computed with
@@ -649,6 +674,7 @@ GOLDEN = {
     "black_karasinski": golden_black_karasinski,
     "tfq_iv": golden_tfq_iv,
     "tfq_iv_approx": golden_tfq_iv,
+    "fam_asian_geo": golden_fam_asian_geo,
     "tfq_asian_geo": golden_tfq_asian_geo,
     "tfq_asian_arith_lb": golden_tfq_asian_arith_lb,
     "tfq_barrier": golden_tfq_barrier,
@@ -695,6 +721,7 @@ GOLDEN_TOL = {"heston": 1e-5, "crr": 1e-4,
               "tfq_iv_approx": 1e-3, "tfq_pde": 5e-3,
               "tfqr_hw_bondcurve": 1e-6, "tfqr_hw_monotone": 1e-9,
               "tfqr_hw_zcb": 1e-9, "tfqr_nss_fit": 1e-9,
+              "fam_asian_geo": 1e-3,
               "tfqr_forwards": 1e-9, "tfqr_cashflows": 1e-8,
               "tfqm_digital": 1e-2, "tfqm_lookback": 1e-2,
               "black_karasinski": 1e-12}  # relative, else 1e-6
