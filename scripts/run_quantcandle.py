@@ -16,7 +16,9 @@ else:
 
 cases = json.loads((ROOT / "cases" / "cases.json").read_text())
 proc = subprocess.run(
-    ["cargo", "run", "-q", *features, "--manifest-path", str(ROOT.parent / "quantcandle" / "Cargo.toml"),
+    ["cargo", "run", "-q", *features, "--manifest-path", str((ROOT.parent / "quantcandle" / "Cargo.toml")
+                        if (ROOT.parent / "quantcandle" / "Cargo.toml").exists()
+                        else (ROOT / "quantcandle" / "Cargo.toml")),
      "--bin", "crosscheck", "--", "--backend", backend],
     input=json.dumps(cases), capture_output=True, text=True)
 if proc.returncode != 0:
