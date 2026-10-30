@@ -2,7 +2,8 @@
 """Run the canonical cases through the quantcandle crosscheck bin.
 Usage: scripts/run_quantcandle.py [--features mkl]  (writes results/quantcandle-<backend>.json)
 """
-import json, subprocess, sys
+import json
+import sys, subprocess, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
