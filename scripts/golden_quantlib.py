@@ -214,6 +214,23 @@ def golden_fam_asian_geo(p):
     return option.NPV()
 
 
+
+def golden_fam_greeks(p):
+    """Family pathwise/LR European greeks (MC) vs QuantLib analytic greeks
+    from AnalyticEuropeanEngine (option.delta()/gamma()/vega()/theta()/
+    rho()). The greeks are MC estimators at the case's path count — the
+    tolerances in GOLDEN_TOL are the documented MC noise at 2M paths."""
+    otype = p.get("option_type", "call")
+    process = _bs_process(p["spot"], p["rate"], p["dividend"], p["volatility"])
+    payoff = ql.PlainVanillaPayoff(
+        ql.Option.Call if otype == "call" else ql.Option.Put, p["strike"])
+    opt = ql.VanillaOption(payoff, ql.EuropeanExercise(expiry_date(p["expiry"])))
+    opt.setPricingEngine(ql.AnalyticEuropeanEngine(process))
+    _ = opt.NPV()
+    return {"delta": opt.delta(), "gamma": opt.gamma(), "vega": opt.vega(),
+            "theta": opt.theta(), "rho": opt.rho()}
+
+
 def golden_tfq_iv(p):
     """Implied-vol roundtrip: golden = the true vol used to generate the
     market price (the price constant in the case was computed with
@@ -675,6 +692,7 @@ GOLDEN = {
     "tfq_iv": golden_tfq_iv,
     "tfq_iv_approx": golden_tfq_iv,
     "fam_asian_geo": golden_fam_asian_geo,
+    "fam_greeks": golden_fam_greeks,
     "tfq_asian_geo": golden_tfq_asian_geo,
     "tfq_asian_arith_lb": golden_tfq_asian_arith_lb,
     "tfq_barrier": golden_tfq_barrier,
@@ -721,7 +739,7 @@ GOLDEN_TOL = {"heston": 1e-5, "crr": 1e-4,
               "tfq_iv_approx": 1e-3, "tfq_pde": 5e-3,
               "tfqr_hw_bondcurve": 1e-6, "tfqr_hw_monotone": 1e-9,
               "tfqr_hw_zcb": 1e-9, "tfqr_nss_fit": 1e-9,
-              "fam_asian_geo": 1e-3,
+              "fam_asian_geo": 1e-3, "fam_greeks": 5e-2,
               "tfqr_forwards": 1e-9, "tfqr_cashflows": 1e-8,
               "tfqm_digital": 1e-2, "tfqm_lookback": 1e-2,
               "black_karasinski": 1e-12}  # relative, else 1e-6

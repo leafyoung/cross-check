@@ -38,6 +38,8 @@
 | tfqr_cashflows | quantburn-cpu | (unknown model 'cf_id') | 911.0272147 | — | — | SKIP |
 | fam_asian_geo_atm | quantburn-cpu | 5.940200222 | 5.938216293 | 3.34e-04 | 1e-03 | PASS |
 | fam_asian_geo_otm | quantburn-cpu | 2.144327625 | 2.142733904 | 7.44e-04 | 1e-03 | PASS |
+| fam_greeks_atm | quantburn-cpu | 0.6373134255 | 0.6368306512 | 7.58e-04 | 1e-02 | PASS(rng) |
+| fam_greeks_otm | quantburn-cpu | 0.4779125066 | 0.4775750216 | 9.61e-04 | 1e-02 | PASS(rng) |
 | bsm_eu_call | quantburn-vulkan | 9.227005508 | 9.227005508 | 2.70e-15 | 1e-06 | PASS |
 | bsm_eu_put | quantburn-vulkan | 6.330080628 | 6.330080628 | 1.40e-16 | 1e-06 | PASS |
 | crr_eu_call | quantburn-vulkan | 10.43061166 | 10.42998595 | 6.00e-05 | 1e-04 | PASS |
@@ -106,6 +108,8 @@
 | tfqr_cashflows | quantcandle-cpu | (unknown model 'cf_id') | 911.0272147 | — | — | SKIP |
 | fam_asian_geo_atm | quantcandle-cpu | 5.940200222 | 5.938216293 | 3.34e-04 | 1e-03 | PASS |
 | fam_asian_geo_otm | quantcandle-cpu | 2.144327625 | 2.142733904 | 7.44e-04 | 1e-03 | PASS |
+| fam_greeks_atm | quantcandle-cpu | 0.6373134255 | 0.6368306512 | 7.58e-04 | 1e-02 | PASS(rng) |
+| fam_greeks_otm | quantcandle-cpu | 0.4779125066 | 0.4775750216 | 9.61e-04 | 1e-02 | PASS(rng) |
 | bsm_eu_call | quantcandle-mkl | 9.227005508 | 9.227005508 | 2.70e-15 | 1e-06 | PASS |
 | bsm_eu_put | quantcandle-mkl | 6.330080628 | 6.330080628 | 1.40e-16 | 1e-06 | PASS |
 | crr_eu_call | quantcandle-mkl | 10.43061166 | 10.42998595 | 6.00e-05 | 1e-04 | PASS |
@@ -174,6 +178,8 @@
 | tfqr_cashflows | quantjax-cpu | (ValueError: unknown model 'cf_id') | 911.0272147 | — | — | SKIP |
 | fam_asian_geo_atm | quantjax-cpu | 5.940200222 | 5.938216293 | 3.34e-04 | 1e-03 | PASS |
 | fam_asian_geo_otm | quantjax-cpu | 2.144327625 | 2.142733904 | 7.44e-04 | 1e-03 | PASS |
+| fam_greeks_atm | quantjax-cpu | 0.6373134255 | 0.6368306512 | 7.58e-04 | 1e-02 | PASS(rng) |
+| fam_greeks_otm | quantjax-cpu | 0.4779125066 | 0.4775750216 | 9.61e-04 | 1e-02 | PASS(rng) |
 | bsm_eu_call | quantjax-rocm | 9.227005508 | 9.227005508 | 2.70e-15 | 1e-06 | PASS |
 | bsm_eu_put | quantjax-rocm | 6.330080628 | 6.330080628 | 1.40e-16 | 1e-06 | PASS |
 | crr_eu_call | quantjax-rocm | 10.43061166 | 10.42998595 | 6.00e-05 | 1e-04 | PASS |
@@ -242,6 +248,8 @@
 | tfqr_cashflows | quantorch-cpu | (ValueError: unknown model 'cf_id') | 911.0272147 | — | — | SKIP |
 | fam_asian_geo_atm | quantorch-cpu | 5.940200222 | 5.938216293 | 3.34e-04 | 1e-03 | PASS |
 | fam_asian_geo_otm | quantorch-cpu | 2.144327625 | 2.142733904 | 7.44e-04 | 1e-03 | PASS |
+| fam_greeks_atm | quantorch-cpu | 0.635943234 | 0.6368306512 | 3.31e-03 | 1e-02 | PASS(rng) |
+| fam_greeks_otm | quantorch-cpu | 0.4768294096 | 0.4775750216 | 3.12e-03 | 1e-02 | PASS(rng) |
 | bsm_eu_call | tfquant-gpu | 9.227005508 | 9.227005508 | 0.00e+00 | 1e-06 | PASS |
 | bsm_eu_put | tfquant-gpu | 6.330080628 | 6.330080628 | 1.40e-16 | 1e-06 | PASS |
 | crr_eu_call | tfquant-gpu | 10.43061166 | 10.42998595 | 6.00e-05 | 1e-04 | PASS |

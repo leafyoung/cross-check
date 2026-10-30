@@ -1,0 +1,26 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: leafyoung/quantburn
+          path: quantburn
+      - uses: actions/checkout@v4
+        with:
+          repository: leafyoung/quantcandle
+          path: quantcandle
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m venv .venv && .venv/bin/pip install QuantLib numpy scipy
+      - run: cargo build --manifest-path quantburn/Cargo.toml --bin crosscheck
+      - run: cargo build --manifest-path quantcandle/Cargo.toml --bin crosscheck
+      - run: .venv/bin/python scripts/golden_quantlib.py
+      - run: .venv/bin/python scripts/run_quantburn.py
+      - run: .venv/bin/python scripts/run_quantcandle.py
+      - run: .venv/bin/python scripts/compare.py

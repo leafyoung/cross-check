@@ -35,6 +35,7 @@ from torchquantlib.models.stochastic_volatility.heston import Heston
 from torchquantlib.models.stochastic_volatility.sabr import SABR, _black76_price
 from torchquantlib.core.risk.market_risk.expected_shortfall import calculate_es
 from torchquantlib.core.risk.market_risk.var import calculate_var
+from torchquantlib.core.risk.greeks.greeks import MalliavinGreeks
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -153,6 +154,12 @@ def price_case(model, p):
     if model == "black_karasinski_zcb":
         b = BlackKarasinski(a_init=p["a"], sigma_init=p["sigma"], r0_init=p["r0"])
         return float(b.zero_coupon_bond_price(p["maturity"], None, 100).item())
+    if model == "greeks_european":
+        g = MalliavinGreeks().european_option_greeks(
+            p["spot"], p["strike"], p["expiry"], p["rate"], p["volatility"],
+            num_paths=p.get("n_paths", 100000), seed=p.get("seed", 42))
+        return {"delta": g["Delta"], "gamma": g["Gamma"], "vega": g["Vega"],
+                "theta": g["Theta"], "rho": g["Rho"]}
     if model == "var":
         return float(calculate_var(t64(p["returns"]), p["confidence_level"]).item())
     if model == "es":
@@ -166,8 +173,11 @@ def main():
     for c in cases:
         entry = {"id": c["id"], "ok": False}
         try:
-            price = price_case(c["model"], c["params"])
-            entry.update(ok=True, price=price)
+            out = price_case(c["model"], c["params"])
+            if isinstance(out, dict):
+                entry.update(ok=True, values={k: float(v) for k, v in out.items()})
+            else:
+                entry.update(ok=True, price=float(out))
             if c["id"] in STOCHASTIC:
                 entry["rng_divergent"] = True
         except Exception as e:

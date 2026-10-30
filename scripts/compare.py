@@ -55,15 +55,20 @@ def rel(a, b):
     return abs(a - b) / max(abs(b), 1e-300)
 
 def vector_rel_err(lp, gp):
-    """Max relative error over every key/value of a dict-of-lists golden
-    payload vs the runner's values dict. Raises ValueError on a shape
-    mismatch (missing key / length mismatch) -> FAIL row."""
+    """Max relative error over every key/value of a golden payload (scalar
+    or dict-of-lists) vs the runner's values dict. Raises ValueError on a
+    mismatch (missing key) -> FAIL row."""
     worst = 0.0
     for k, gv in gp.items():
-        if k not in lp or len(lp[k]) != len(gv):
-            raise ValueError(f"payload mismatch on key '{k}'")
-        for a, b in zip(lp[k], gv):
-            worst = max(worst, rel(a, b))
+        if k not in lp:
+            raise ValueError(f"payload missing key '{k}'")
+        if isinstance(gv, list):
+            if len(lp[k]) != len(gv):
+                raise ValueError(f"payload length mismatch on key '{k}'")
+            for a, b in zip(lp[k], gv):
+                worst = max(worst, rel(a, b))
+        else:
+            worst = max(worst, rel(lp[k], gv))
     return worst
 
 def first_val(x):
@@ -94,7 +99,9 @@ for name, res in libs.items():
         try:
             if metric_name == "vector":
                 e = vector_rel_err(lp, g["price"])
-                show = next(iter(lp.values()))[0]
+                show = next(iter(lp.values()))
+                if isinstance(show, list):
+                    show = show[0]
             else:
                 e = rel(lp, g["price"])
                 show = lp

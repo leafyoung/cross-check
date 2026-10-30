@@ -856,6 +856,36 @@
         "average_type": "geometric",
         "steps": 12
       }
+    },
+    {
+      "id": "fam_greeks_atm",
+      "model": "greeks_european",
+      "golden": "fam_greeks",
+      "params": {
+        "spot": 100,
+        "strike": 100,
+        "expiry": 1.0,
+        "volatility": 0.2,
+        "rate": 0.05,
+        "dividend": 0.0,
+        "n_paths": 2000000,
+        "seed": 3001
+      }
+    },
+    {
+      "id": "fam_greeks_otm",
+      "model": "greeks_european",
+      "golden": "fam_greeks",
+      "params": {
+        "spot": 100,
+        "strike": 110,
+        "expiry": 1.0,
+        "volatility": 0.25,
+        "rate": 0.05,
+        "dividend": 0.0,
+        "n_paths": 2000000,
+        "seed": 3001
+      }
     }
   ]
 }
